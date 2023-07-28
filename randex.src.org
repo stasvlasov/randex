@@ -1,0 +1,140 @@
+#+title: Arguably faster Rand Index calcuation
+#+author: Stas Vlasov
+#+r_package_version: 0.0.0.9000
+#+r_package_url: <<github-repo()>>
+#+r_package_bug_reports: <<github-repo()>>/issues
+
+* README
+:PROPERTIES:
+:export_file_name: README.md
+:export_options: toc:nil
+:export_options+: author:nil
+:export_options+: title:nil
+:END:
+
+#+begin: md-badges :codecove-token nil
+#+end
+
+** Description
+#+name: package-description
+#+begin_src org :exports results :results replace :eval yes
+  Calculates the [[https://en.wikipedia.org/wiki/Rand_index][Rand Index]]. Specifically tuned for large datasets with many small clusters.
+#+end_src
+
+** Benchmarking
+
+#+BEGIN_SRC R :exports code
+  a <-
+      lapply(1:10^4, \(i) {
+          set.seed(111 + i)
+          sample(letters, 3)
+      }) |>
+      sapply(paste, collapse = "") |>
+      as.factor() |>
+      as.numeric()
+
+
+  b <-
+      lapply(1:10^4, \(i) {
+          set.seed(222 + i)
+          sample(letters, 3)
+      }) |>
+      sapply(paste, collapse = "") |>
+      as.factor() |>
+      as.numeric()
+
+
+  parse
+
+  dt <- 
+      c('rand_index'
+       , 'matchFeat::Rand.index'
+      , 'fossil::rand.index'
+        ## , 'ClustOfVar::rand'
+        ## , 'stela2502/RFclust.SGE::Rand'
+        ## , 'ramhiser/clusteval::rand'
+        ## , 'lbelzile/hecmulti::rand'
+        ) |> lapply(
+                 \(func) {
+                     ## ns <- sub("::.*$", "", func)
+                     ## func <- sub("^.*::", "", func)
+                     Rprof(memory.profiling = TRUE)
+                     ## val <- do.call(getFromNamespace(func, ns), list(a, b))
+                     val <- eval(str2expression(paste0(func, "(a, b)")))
+                     Rprof(NULL)
+                     prof <- summaryRprof(memory = "both")
+                     prof_mem <- prof$by.self[paste0('"', func, '"'), "mem.total"][[1]]
+                     prof_time <- prof$by.total[paste0('"', func, '"'), "total.time"]
+                     list(func = func
+                        , val = val
+                        , mem = paste(prof_mem, 'Mb')
+                        , time = paste(prof_time, 's'))
+                 }) |>
+      do.call(rbind, args = _)
+
+#+END_SRC
+
+** Installation
+
+#+BEGIN_SRC R :noweb yes
+  devtools::install_github("<<github-repo()>>")
+#+END_SRC
+
+** Dependencies
+
+#+caption: Hard dependencies (=Depends= field in =DESCRIPTION= file)
+#+name: ob-r-pkg-table-depends
+| name  | version | comment                                   |
+|-------+---------+-------------------------------------------|
+| [[https://www.r-project.org/][R]]     |   4.2.0 | minimum R version to enable native piping |
+
+#+caption: Required packages (=Imports= field in the =DESCRIPTION= file)
+#+name: ob-r-pkg-table-imports
+| name       | version | comment                                                   |
+|------------+---------+-----------------------------------------------------------|
+| [[https://rdatatable.gitlab.io/data.table/][data.table]] |         | fast data.frames, used as main input and output data type |
+
+
+
+* rand_index
+
+#+BEGIN_SRC R :tangle R/rand_index.r :mkdirp yes
+  rand_index <- function(a, b) {
+      stopifnot(length(a) == length(b))
+      n_pairs <- choose(length(a), 2)
+      message("    rand_index -- factoring")
+      a <- factor(a, exclude = NULL) |> as.numeric()
+      b <- factor(b, exclude = NULL) |> as.numeric()
+      message("    rand_index -- tabbing")
+      dt <- data.table::data.table(a = a, b = b)[
+                          , n_a := .N, by = a
+                        ][
+                          , n_b := .N, by = b
+                        ][
+                          , n_a_b := .N, by = .(a, b)
+                        ]
+      ## sum pairs between 'agreement' intersect clusters and 'disagreement'
+      message("    rand_index -- combn A")
+      a_comb <-
+          unique(
+              dt[n_a > 1 ,.(a, b, n_a, n_a_b)]
+          )[
+            , .(comb = (n_a - n_a_b) * n_a_b), by = a
+          ] |>
+          _$comb |>
+          sum(na.rm = TRUE)
+      message("    rand_index -- combn B")
+      b_comb <-
+          unique(
+              dt[n_b > 1 ,.(a, b, n_b, n_a_b)]
+          )[
+            , .(comb = (n_b - n_a_b) * n_a_b), by = b
+          ] |>
+          _$comb |>
+          sum(na.rm = TRUE)
+      ## in formula 'c + d as the number of disagreements'
+      n_disagreements <- (a_comb + b_comb) / 2  # was conting pairs twice
+      return(1 - (n_disagreements / n_pairs))
+  }
+
+#+END_SRC
