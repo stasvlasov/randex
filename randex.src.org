@@ -2,8 +2,8 @@
 #+author: Stas Vlasov
 #+email: s.vlasov@uvt.nl
 #+r_package_version: 0.0.0.9000
-#+r_package_url: <<github-repo()>>
-#+r_package_bug_reports: <<github-repo()>>/issues
+#+r_package_url: <<ob-r-pkg-utils-get-github-repo()>>
+#+r_package_bug_reports: <<ob-r-pkg-utils-get-github-repo()>>/issues
 
 * README
 :PROPERTIES:
@@ -83,7 +83,7 @@
 ** Installation
 
 #+BEGIN_SRC R :noweb yes
-  devtools::install_github("<<github-repo()>>")
+  devtools::install_github("<<ob-r-pkg-utils-get-github-repo()>>")
 #+END_SRC
 
 ** Dependencies
