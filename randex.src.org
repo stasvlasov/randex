@@ -1,5 +1,6 @@
-#+title: Arguably faster Rand Index calcuation
+#+title: Fast and memory efficient Rand Index calculation
 #+author: Stas Vlasov
+#+email: s.vlasov@uvt.nl
 #+r_package_version: 0.0.0.9000
 #+r_package_url: <<github-repo()>>
 #+r_package_bug_reports: <<github-repo()>>/issues
@@ -13,6 +14,10 @@
 :END:
 
 #+begin: md-badges :codecove-token nil
+#+begin_export markdown
+[![R-CMD-check](https://github.com/stasvlasov/randex/workflows/R-CMD-check/badge.svg)](https://github.com/stasvlasov/randex/actions)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/stasvlasov/randex)
+#+end_export
 #+end
 
 ** Description
@@ -43,35 +48,36 @@
       as.factor() |>
       as.numeric()
 
-
-  parse
-
-  dt <- 
-      c('rand_index'
-       , 'matchFeat::Rand.index'
-      , 'fossil::rand.index'
-        ## , 'ClustOfVar::rand'
-        ## , 'stela2502/RFclust.SGE::Rand'
-        ## , 'ramhiser/clusteval::rand'
-        ## , 'lbelzile/hecmulti::rand'
-        ) |> lapply(
-                 \(func) {
-                     ## ns <- sub("::.*$", "", func)
-                     ## func <- sub("^.*::", "", func)
-                     Rprof(memory.profiling = TRUE)
-                     ## val <- do.call(getFromNamespace(func, ns), list(a, b))
-                     val <- eval(str2expression(paste0(func, "(a, b)")))
-                     Rprof(NULL)
-                     prof <- summaryRprof(memory = "both")
-                     prof_mem <- prof$by.self[paste0('"', func, '"'), "mem.total"][[1]]
-                     prof_time <- prof$by.total[paste0('"', func, '"'), "total.time"]
-                     list(func = func
-                        , val = val
-                        , mem = paste(prof_mem, 'Mb')
-                        , time = paste(prof_time, 's'))
-                 }) |>
+  c('randex::rand_index'
+  , 'matchFeat::Rand.index'
+  , 'fossil::rand.index'
+    ## , 'ClustOfVar::rand'
+    ## , 'stela2502/RFclust.SGE::Rand'
+    ## , 'ramhiser/clusteval::rand'
+    ## , 'lbelzile/hecmulti::rand'
+    ) |> lapply(
+             \(func) {
+                 ## ns <- sub("::.*$", "", func)
+                 ## func <- sub("^.*::", "", func)
+                 Rprof(memory.profiling = TRUE)
+                 ## val <- do.call(getFromNamespace(func, ns), list(a, b))
+                 val <- eval(str2expression(paste0(func, "(a, b)")))
+                 Rprof(NULL)
+                 prof <- summaryRprof(memory = "both")
+                 prof_mem <- prof$by.self[paste0('"', func, '"'), "mem.total"][[1]]
+                 prof_time <- prof$by.total[paste0('"', func, '"'), "total.time"]
+                 list(func = func
+                    , val = val
+                    , mem = paste(prof_mem, 'Mb')
+                    , time = paste(prof_time, 's'))
+             }) |>
       do.call(rbind, args = _)
 
+
+  ##      func                    val       mem         time    
+  ## [1,] "rand_index"            0.9998728 "3 Mb"     "0.36 s"
+  ## [2,] "matchFeat::Rand.index" 0.9998728 "840 Mb"    "0.96 s"
+  ## [3,] "fossil::rand.index"    0.9998728 "7393.2 Mb" "4.62 s"
 #+END_SRC
 
 ** Installation
@@ -99,6 +105,12 @@
 * rand_index
 
 #+BEGIN_SRC R :tangle R/rand_index.r :mkdirp yes
+  ##' Computes Rand index. 
+  ##' @param a particion 1 as vector
+  ##' @param b partition 2 as vector
+  ##' @return Rand index that ranges from 0 to 1 
+  ##' 
+  ##' @export 
   rand_index <- function(a, b) {
       stopifnot(length(a) == length(b))
       n_pairs <- choose(length(a), 2)
