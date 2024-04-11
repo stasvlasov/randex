@@ -60,13 +60,13 @@
 <div class="section level1">
 <div class="page-header"><h1 id="about">About<a class="anchor" aria-label="anchor" href="#about"></a>
 </h1></div>
-<p>Calculates the <a href="https://en.wikipedia.org/wiki/Rand_index" class="external-link">Rand Index</a>. The algorithm for Rand Index estimation specifically meant for large datasets with many small clusters in which case it is the fastest and most memory efficient in comparison to procedures from other available packages (see benchmarking below).</p>
-<p>R packages that provide some function/method for calculating Rand index.</p>
+<p>Memory efficient and fast calculation of <a href="https://en.wikipedia.org/wiki/Rand_index" class="external-link">Rand Index</a>. The package offers algorithm for Rand Index estimation that is specifically meant for large datasets with many small clusters making it the fastest and most memory efficient in comparison to other available R packages (see benchmarking below).</p>
+<p><img src="./benchmarks.png"></p>
 <table class="table">
 <colgroup>
-<col width="57%">
-<col width="10%">
-<col width="31%">
+<col width="39%">
+<col width="7%">
+<col width="52%">
 </colgroup>
 <thead><tr class="header">
 <th>package</th>
@@ -77,7 +77,7 @@
 <tr class="odd">
 <td><a href="https://stasvlasov.github.io/randex/" class="external-link">randex</a></td>
 <td>0.0.0.9000</td>
-<td>It is this package</td>
+<td>This package</td>
 </tr>
 <tr class="even">
 <td><a href="https://github.com/ramhiser/clusteval" class="external-link">clusteval</a></td>
@@ -102,19 +102,20 @@
 <tr class="even">
 <td><a href="https://lbelzile.github.io/hecmulti/" class="external-link">hecmulti</a></td>
 <td>2023.11.19</td>
-<td>Docs are in French:) Beautiful.</td>
+<td>Documentation in French:)</td>
 </tr>
 <tr class="odd">
 <td><a href="https://github.com/stela2502/RFclust.SGE" class="external-link">RFclust.SGE</a></td>
 <td>0.0.0.9000</td>
-<td>Could not get it to work. Broken?</td>
+<td>Does not work. Filed an <a href="https://github.com/stela2502/RFclust.SGE/issues/1" class="external-link">issue</a>
+</td>
 </tr>
 </tbody>
 </table>
 <div class="section level2">
 <h2 id="rand-index-estimation">Rand index estimation<a class="anchor" aria-label="anchor" href="#rand-index-estimation"></a>
 </h2>
-<p>Rand index measures similarity between two particitionings <span class="math inline"><em>X</em></span> and <span class="math inline"><em>Y</em></span> (a.k.a., clusterings) of a set of <span class="math inline"><em>n</em></span> elements <span class="math inline"><em>S</em></span>. It can also be seen as a probability of a random pair of elements from <span class="math inline"><em>S</em></span> to be either in a same subset/cluster in both partitions or to be in different subsets/clusters in both partitions. It calculates as following:</p>
+<p>Rand index measures similarity between two partitionings <span class="math inline"><em>X</em></span> and <span class="math inline"><em>Y</em></span> (a.k.a., clusterings) of a set of <span class="math inline"><em>n</em></span> elements <span class="math inline"><em>S</em></span>. It can also be seen as a probability of a random pair of elements from <span class="math inline"><em>S</em></span> to be either in a same subset/cluster in both partitions or to be in different subsets/clusters in both partitions. It calculates as following:</p>
 <pre class="math"><code>Rand Index = \frac {TP + TN} {TP + FP + FN + TN} = 2 \times \frac {TP + TN} {n \times (n-1)}</code></pre>
 <p>, where:</p>
 <ul>
@@ -130,7 +131,7 @@
 <span class="math inline"><em>F</em><em>N</em></span> is the number of false negatives, i.e., a number of pairs of elements in <span class="math inline"><em>S</em></span> that are in <strong>different</strong> subsets in <span class="math inline"><em>X</em></span> and are in <strong>same</strong> subset in <span class="math inline"><em>Y</em></span>
 </li>
 </ul>
-<p>The calculation of Rand Index implemented in <code>randex</code> package is slightly different from the straighforward calculation that follows the the above defitions. Since it is easear to compute disagreements between paritioning (i.e., <span class="math inline"><em>F</em><em>P</em></span> and <span class="math inline"><em>F</em><em>N</em></span>) rather than agreements (<span class="math inline"><em>T</em><em>P</em></span> + <span class="math inline"><em>T</em><em>N</em></span>) we can calculate it as <span class="math inline">$Rand Index = 1 - 2 \times \frac {FP + FN} {n \times (n-1)}$</span>.</p>
+<p>The calculation of Rand Index implemented in <code>randex</code> package is slightly different from the straightforward calculation that follows the the above definition. Since it is easier to compute disagreements between partitioning (i.e., <span class="math inline"><em>F</em><em>P</em></span> and <span class="math inline"><em>F</em><em>N</em></span>) rather than agreements (<span class="math inline"><em>T</em><em>P</em></span> + <span class="math inline"><em>T</em><em>N</em></span>) we can calculate it as <span class="math inline">$Rand Index = 1 - 2 \times \frac {FP + FN} {n \times (n-1)}$</span>. The package relies on <code>data.table</code> features for efficient data manipulation in memory.</p>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
@@ -494,7 +495,7 @@
 <span id="cb4-252"><a href="#cb4-252" tabindex="-1"></a>      (synopsis <span class="st">"Evaluation of Clustering Algorithms"</span>)</span>
 <span id="cb4-253"><a href="#cb4-253" tabindex="-1"></a>      (description</span>
 <span id="cb4-254"><a href="#cb4-254" tabindex="-1"></a>       <span class="st">"This package provides a suite of tools to evaluate clustering algorithms,</span></span>
-<span id="cb4-255"><a href="#cb4-255" tabindex="-1"></a><span class="st">clusterings, and individual clusters."</span>)</span>
+<span id="cb4-255"><a href="#cb4-255" tabindex="-1"></a><span class="st">clustering, and individual clusters."</span>)</span>
 <span id="cb4-256"><a href="#cb4-256" tabindex="-1"></a>      (license expat))))</span>
 <span id="cb4-257"><a href="#cb4-257" tabindex="-1"></a></span>
 <span id="cb4-258"><a href="#cb4-258" tabindex="-1"></a></span>
