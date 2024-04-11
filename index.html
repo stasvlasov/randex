@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fast and memory efficient Rand Index calculation • randex</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -58,68 +58,121 @@
 
 
 <div class="section level1">
-<div class="page-header"><h1 id="description">Description<a class="anchor" aria-label="anchor" href="#description"></a>
+<div class="page-header"><h1 id="about">About<a class="anchor" aria-label="anchor" href="#about"></a>
 </h1></div>
-<p>Calculates the <a href="https://en.wikipedia.org/wiki/Rand_index" class="external-link">Rand Index</a>. Specifically tuned for large datasets with many small clusters.</p>
+<p>Calculates the <a href="https://en.wikipedia.org/wiki/Rand_index" class="external-link">Rand Index</a>. The algorithm for Rand Index estimation specifically meant for large datasets with many small clusters in which case it is the fastest and most memory efficient in comparison to procedures from other available packages (see benchmarking below).</p>
+<p>R packages that provide some function/method for calculating Rand index.</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="22%">
+<col width="32%">
+<col width="4%">
+<col width="14%">
+</colgroup>
+<thead><tr class="header">
+<th>package</th>
+<th>repo</th>
+<th>call</th>
+<th>version</th>
+<th>comment</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://stasvlasov.github.io/randex/" class="external-link">randex</a></td>
+<td><a href="https://github.com/stasvlasov/randex" class="external-link">git</a></td>
+<td>randex::rand<sub>index</sub>(a, b)</td>
+<td>0.0.0.9000</td>
+<td>It is this package</td>
+</tr>
+<tr class="even">
+<td><a href="https://github.com/ramhiser/clusteval" class="external-link">clusteval</a></td>
+<td><a href="https://github.com/ramhiser/clusteval" class="external-link">git</a></td>
+<td>clusteval::rand(a, b)</td>
+<td>0.2.1</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><a href="https://github.com/ddegras/matchFeat" class="external-link">matchFeat</a></td>
+<td><a href="https://CRAN.R-project.org/package=matchFeat" class="external-link">cran</a></td>
+<td>matchFeat::Rand.index(a, b)</td>
+<td>1.0</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><a href="https://matthewvavrek.com/programs-and-code/fossil/" class="external-link">fossil</a></td>
+<td><a href="https://cran.r-project.org/package=fossil" class="external-link">cran</a></td>
+<td>fossil::rand.index(a, b)</td>
+<td>0.4.0</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><a href="https://cran.r-project.org/package=ClustOfVar" class="external-link">ClustOfVar</a></td>
+<td><a href="https://cran.r-project.org/package=ClustOfVar" class="external-link">cran</a></td>
+<td>ClustOfVar::rand(a, b, adj = FALSE)</td>
+<td>1.1</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><a href="https://lbelzile.github.io/hecmulti/" class="external-link">hecmulti</a></td>
+<td><a href="https://github.com/lbelzile/hecmulti" class="external-link">git</a></td>
+<td>hecmulti::rand(a, b)</td>
+<td>2023.11.19</td>
+<td>Docs are in French:) Beautiful.</td>
+</tr>
+<tr class="odd">
+<td><a href="https://github.com/stela2502/RFclust.SGE" class="external-link">RFclust.SGE</a></td>
+<td></td>
+<td>getMethod(f = RFclust.SGE:::Rand, signature = ‘RFclust.SGE’)(data.frame(a,b))</td>
+<td>0.0.0.9000</td>
+<td>Could not get it to work. Broken?</td>
+</tr>
+</tbody>
+</table>
+<div class="section level2">
+<h2 id="rand-index-estimation">Rand index estimation<a class="anchor" aria-label="anchor" href="#rand-index-estimation"></a>
+</h2>
+<p>Rand index measures similarity between two particitionings <span class="math inline"><em>X</em></span> and <span class="math inline"><em>Y</em></span> (a.k.a., clusterings) of a set of <span class="math inline"><em>n</em></span> elements <span class="math inline"><em>S</em></span>. It can also be seen as a probability of a random pair of elements from <span class="math inline"><em>S</em></span> to be either in a same subset/cluster in both partitions or to be in different subsets/clusters in both partitions. It calculates as following:</p>
+<pre class="math"><code>Rand Index = \frac {TP + TN} {TP + FP + FN + TN} = 2 \times \frac {TP + TN} {n \times (n-1)}</code></pre>
+<p>, where:</p>
+<ul>
+<li>
+<span class="math inline"><em>T</em><em>P</em></span> is the number of <strong>true positives</strong>, i.e., a number of pairs of elements in <span class="math inline"><em>S</em></span> that are in the <strong>same</strong> subset for both partitionins <span class="math inline"><em>X</em></span> and <span class="math inline"><em>Y</em></span>
+</li>
+<li>
+<span class="math inline"><em>T</em><em>N</em></span> is the number of <strong>true negatives</strong>, i.e., a number of pairs of elements in <span class="math inline"><em>S</em></span> that are in <strong>different</strong> subsets for both partitionins <span class="math inline"><em>X</em></span> and</li>
+<li>
+<span class="math inline"><em>F</em><em>P</em></span> is the number of false positives, i.e., a number of pairs of elements in <span class="math inline"><em>S</em></span> that are in <strong>same</strong> subset in <span class="math inline"><em>X</em></span> (assuming that <span class="math inline"><em>X</em></span> represents ground thuth parititioning) and are in <strong>different</strong> subsets in <span class="math inline"><em>Y</em></span>
+</li>
+<li>
+<span class="math inline"><em>F</em><em>N</em></span> is the number of false negatives, i.e., a number of pairs of elements in <span class="math inline"><em>S</em></span> that are in <strong>different</strong> subsets in <span class="math inline"><em>X</em></span> and are in <strong>same</strong> subset in <span class="math inline"><em>Y</em></span>
+</li>
+</ul>
+<p>The calculation of Rand Index implemented in <code>randex</code> package is slightly different from the straighforward calculation that follows the the above defitions. Since it is easear to compute disagreements between paritioning (i.e., <span class="math inline"><em>F</em><em>P</em></span> and <span class="math inline"><em>F</em><em>N</em></span>) rather than agreements (<span class="math inline"><em>T</em><em>P</em></span> + <span class="math inline"><em>T</em><em>N</em></span>) we can calculate it as <span class="math inline">$Rand Index = 1 - 2 \times \frac {FP + FN} {n \times (n-1)}$</span>.</p>
 </div>
-<div class="section level1">
-<h1 id="benchmarking">Benchmarking<a class="anchor" aria-label="anchor" href="#benchmarking"></a>
-</h1>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">a</span> <span class="op">&lt;-</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">^</span><span class="fl">4</span>, \<span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">111</span> <span class="op">+</span> <span class="va">i</span><span class="op">)</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span>    <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">paste</span>, collapse <span class="op">=</span> <span class="st">""</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="va">b</span> <span class="op">&lt;-</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">^</span><span class="fl">4</span>, \<span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">222</span> <span class="op">+</span> <span class="va">i</span><span class="op">)</span></span>
-<span>        <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="va">letters</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span>    <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">paste</span>, collapse <span class="op">=</span> <span class="st">""</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'randex::rand_index'</span></span>
-<span>, <span class="st">'matchFeat::Rand.index'</span></span>
-<span>, <span class="st">'fossil::rand.index'</span></span>
-<span>  <span class="co">## , 'ClustOfVar::rand'</span></span>
-<span>  <span class="co">## , 'stela2502/RFclust.SGE::Rand'</span></span>
-<span>  <span class="co">## , 'ramhiser/clusteval::rand'</span></span>
-<span>  <span class="co">## , 'lbelzile/hecmulti::rand'</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
-<span>           \<span class="op">(</span><span class="va">func</span><span class="op">)</span> <span class="op">{</span></span>
-<span>               <span class="co">## ns &lt;- sub("::.*$", "", func)</span></span>
-<span>               <span class="co">## func &lt;- sub("^.*::", "", func)</span></span>
-<span>               <span class="fu"><a href="https://rdrr.io/r/utils/Rprof.html" class="external-link">Rprof</a></span><span class="op">(</span>memory.profiling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>               <span class="co">## val &lt;- do.call(getFromNamespace(func, ns), list(a, b))</span></span>
-<span>               <span class="va">val</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html" class="external-link">eval</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/parse.html" class="external-link">str2expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">func</span>, <span class="st">"(a, b)"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>               <span class="fu"><a href="https://rdrr.io/r/utils/Rprof.html" class="external-link">Rprof</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
-<span>               <span class="va">prof</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/summaryRprof.html" class="external-link">summaryRprof</a></span><span class="op">(</span>memory <span class="op">=</span> <span class="st">"both"</span><span class="op">)</span></span>
-<span>               <span class="va">prof_mem</span> <span class="op">&lt;-</span> <span class="va">prof</span><span class="op">$</span><span class="va">by.self</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'"'</span>, <span class="va">func</span>, <span class="st">'"'</span><span class="op">)</span>, <span class="st">"mem.total"</span><span class="op">]</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span>               <span class="va">prof_time</span> <span class="op">&lt;-</span> <span class="va">prof</span><span class="op">$</span><span class="va">by.total</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'"'</span>, <span class="va">func</span>, <span class="st">'"'</span><span class="op">)</span>, <span class="st">"total.time"</span><span class="op">]</span></span>
-<span>               <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>func <span class="op">=</span> <span class="va">func</span></span>
-<span>                  , val <span class="op">=</span> <span class="va">val</span></span>
-<span>                  , mem <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">prof_mem</span>, <span class="st">'Mb'</span><span class="op">)</span></span>
-<span>                  , time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">prof_time</span>, <span class="st">'s'</span><span class="op">)</span><span class="op">)</span></span>
-<span>           <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, args <span class="op">=</span> <span class="va">_</span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="co">##      func                    val       mem         time    </span></span>
-<span><span class="co">## [1,] "rand_index"            0.9998728 "3 Mb"     "0.36 s"</span></span>
-<span><span class="co">## [2,] "matchFeat::Rand.index" 0.9998728 "840 Mb"    "0.96 s"</span></span>
-<span><span class="co">## [3,] "fossil::rand.index"    0.9998728 "7393.2 Mb" "4.62 s"</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<p>ClustOfVar- <a href="https://www.jstatsoft.org/article/view/v050i13" class="external-link">ClustOfVar: An R Package for the Clustering of Variables | Journal of Statistical Software</a></p>
+<p>matchFeat - Degras (2021). Scalable Feature Matching Across Large Data Collections. <a href="https://arxiv.org/abs/2101.02035" class="external-link uri">https://arxiv.org/abs/2101.02035</a> <a href="https://www.tandfonline.com/doi/full/10.1080/10618600.2022.2074429" class="external-link">Scalable Feature Matching Across Large Data Collections: Journal of Computational and Graphical Statistics: Vol 32 , No 1 - Get Access</a> <a href="https://www.tandfonline.com/doi/full/10.1057/palgrave.jors.2601723" class="external-link">Local search heuristics for multi-index assignment problems with decomposable costs: Journal of the Operational Research Society: Vol 55 , No 7 - Get Access</a></p>
+<p>fossil-</p>
+<pre class="biblatex"><code>@Article{,
+  title = {fossil: palaeoecological and palaeogeographical analysis
+    tools},
+  author = {Matthew J. Vavrek},
+  year = {2011},
+  journal = {Palaeontologia Electronica},
+  volume = {14},
+  pages = {1T},
+  number = {1},
+  note = {R package version 0.4.0},
+}</code></pre>
+</div>
 </div>
 <div class="section level1">
 <h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h1>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"stasvlasov/randex"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level1">
@@ -161,12 +214,368 @@
 </tr></tbody>
 </table>
 <p>Required packages (<code>Imports</code> field in the <code>DESCRIPTION</code> file)</p>
+<table class="table">
+<colgroup>
+<col width="57%">
+<col width="6%">
+<col width="36%">
+</colgroup>
+<thead><tr class="header">
+<th>name</th>
+<th>version</th>
+<th>comment</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://github.com/markvanderloo/tinytest/blob/master/pkg/README.md" class="external-link">tinytest</a></td>
+<td></td>
+<td>package development (unit testing)</td>
+</tr>
+<tr class="even">
+<td>ggplot2</td>
+<td></td>
+<td>for visualizing benchmarks</td>
+</tr>
+<tr class="odd">
+<td>patchwork</td>
+<td></td>
+<td>for combining plots of memory and time benchmarks</td>
+</tr>
+</tbody>
+</table>
+<p>Suggested packages (<code>Suggests</code> field in the <code>DESCRIPTION</code> file)</p>
+</div>
+<div class="section level1">
+<h1 id="benchmark">Benchmark<a class="anchor" aria-label="anchor" href="#benchmark"></a>
+</h1>
+<p>The source code for benchmarking is below. All packages used in this benchmark can be fully reproduced with Guix package manager. The module with the packages definitions is below.</p>
+<div class="section level2">
+<h2 id="some-results-to-sto">some results (to sto)<a class="anchor" aria-label="anchor" href="#some-results-to-sto"></a>
+</h2>
+<p>[2024-02-14 Wed] ## N &lt;- 22:25 lentgh 3</p>
+<p>Evaluating: matchFeat::Rand.index(a, b) call sample result memory elapsed (sec) [1,] “randex::rand<sub>index</sub>(a, b)” 4194304 NA 1682838448 11.607 [2,] “matchFeat::Rand.index(a, b)” 4194304 0.9998718 4334704504 8.563 $call</p>
+</div>
+<div class="section level2">
+<h2 id="guix-module-with-r-packages-for-benchmark">Guix module with R packages for Benchmark<a class="anchor" aria-label="anchor" href="#guix-module-with-r-packages-for-benchmark"></a>
+</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode scheme"><code class="sourceCode scheme"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>(<span class="ex">define-module</span><span class="fu"> </span>(my packages r)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  #:use-module (gnu packages)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  #:use-module (gnu packages statistics)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  #:use-module (guix packages)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  #:use-module (guix download)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  #:use-module (guix build utils)</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  #:use-module (guix build-system r)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  #:use-module (guix build-system trivial)</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  #:use-module (guix licenses)</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  <span class="co">;; #:use-module (git)</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  <span class="co">;; #:use-module (guix git)</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  #:use-module (guix git-download)</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  )</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">;; guix import cran --recursive ClustOfVar</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>(<span class="ex">define-public</span><span class="fu"> r-pcamixdata</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  (package</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>    (name <span class="st">"r-pcamixdata"</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a>    (version <span class="st">"3.1"</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a>    (source</span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a>     (origin</span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a>       (method url-fetch)</span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a>       (uri (cran-uri <span class="st">"PCAmixdata"</span> version))</span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a>       (sha256</span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a>        (base32 <span class="st">"0flrsnbchwk06dmkg3vqykp9n4pqs265szn1r10navp8ki3rrmvh"</span>))))</span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a>    (properties `((upstream-name <span class="op">.</span> <span class="st">"PCAmixdata"</span>)))</span>
+<span id="cb4-30"><a href="#cb4-30" tabindex="-1"></a>    (build-system r-build-system)</span>
+<span id="cb4-31"><a href="#cb4-31" tabindex="-1"></a>    (native-inputs (<span class="kw">list</span> (specification-&gt;package <span class="st">"r-knitr"</span>)))</span>
+<span id="cb4-32"><a href="#cb4-32" tabindex="-1"></a>    (home-page <span class="st">"https://cran.r-project.org/package=PCAmixdata"</span>)</span>
+<span id="cb4-33"><a href="#cb4-33" tabindex="-1"></a>    (synopsis <span class="st">"Multivariate Analysis of Mixed Data"</span>)</span>
+<span id="cb4-34"><a href="#cb4-34" tabindex="-1"></a>    (description</span>
+<span id="cb4-35"><a href="#cb4-35" tabindex="-1"></a>     <span class="st">"This package implements principal component analysis, orthogonal rotation and</span></span>
+<span id="cb4-36"><a href="#cb4-36" tabindex="-1"></a><span class="st">multiple factor analysis for a mixture of quantitative and qualitative</span></span>
+<span id="cb4-37"><a href="#cb4-37" tabindex="-1"></a><span class="st">variables."</span>)</span>
+<span id="cb4-38"><a href="#cb4-38" tabindex="-1"></a>    (license gpl2+)))</span>
+<span id="cb4-39"><a href="#cb4-39" tabindex="-1"></a></span>
+<span id="cb4-40"><a href="#cb4-40" tabindex="-1"></a>(<span class="ex">define-public</span><span class="fu"> r-clustofvar</span></span>
+<span id="cb4-41"><a href="#cb4-41" tabindex="-1"></a>  (package</span>
+<span id="cb4-42"><a href="#cb4-42" tabindex="-1"></a>    (name <span class="st">"r-clustofvar"</span>)</span>
+<span id="cb4-43"><a href="#cb4-43" tabindex="-1"></a>    (version <span class="st">"1.1"</span>)</span>
+<span id="cb4-44"><a href="#cb4-44" tabindex="-1"></a>    (source</span>
+<span id="cb4-45"><a href="#cb4-45" tabindex="-1"></a>     (origin</span>
+<span id="cb4-46"><a href="#cb4-46" tabindex="-1"></a>       (method url-fetch)</span>
+<span id="cb4-47"><a href="#cb4-47" tabindex="-1"></a>       (uri (cran-uri <span class="st">"ClustOfVar"</span> version))</span>
+<span id="cb4-48"><a href="#cb4-48" tabindex="-1"></a>       (sha256</span>
+<span id="cb4-49"><a href="#cb4-49" tabindex="-1"></a>        (base32 <span class="st">"0grhkab7s58ji4cf7cxh7ahd2dxrj8aqfdf3119b40zxkxbwxcr0"</span>))))</span>
+<span id="cb4-50"><a href="#cb4-50" tabindex="-1"></a>    (properties `((upstream-name <span class="op">.</span> <span class="st">"ClustOfVar"</span>)))</span>
+<span id="cb4-51"><a href="#cb4-51" tabindex="-1"></a>    (build-system r-build-system)</span>
+<span id="cb4-52"><a href="#cb4-52" tabindex="-1"></a>    (propagated-inputs (<span class="kw">list</span> r-pcamixdata))</span>
+<span id="cb4-53"><a href="#cb4-53" tabindex="-1"></a>    (home-page <span class="st">"https://cran.r-project.org/package=ClustOfVar"</span>)</span>
+<span id="cb4-54"><a href="#cb4-54" tabindex="-1"></a>    (synopsis <span class="st">"Clustering of Variables"</span>)</span>
+<span id="cb4-55"><a href="#cb4-55" tabindex="-1"></a>    (description</span>
+<span id="cb4-56"><a href="#cb4-56" tabindex="-1"></a>     <span class="st">"Cluster analysis of a set of variables.  Variables can be quantitative,</span></span>
+<span id="cb4-57"><a href="#cb4-57" tabindex="-1"></a><span class="st">qualitative or a mixture of both."</span>)</span>
+<span id="cb4-58"><a href="#cb4-58" tabindex="-1"></a>    (license gpl2+)))</span>
+<span id="cb4-59"><a href="#cb4-59" tabindex="-1"></a></span>
+<span id="cb4-60"><a href="#cb4-60" tabindex="-1"></a></span>
+<span id="cb4-61"><a href="#cb4-61" tabindex="-1"></a></span>
+<span id="cb4-62"><a href="#cb4-62" tabindex="-1"></a></span>
+<span id="cb4-63"><a href="#cb4-63" tabindex="-1"></a><span class="co">;; guix import cran --recursive fossil</span></span>
+<span id="cb4-64"><a href="#cb4-64" tabindex="-1"></a></span>
+<span id="cb4-65"><a href="#cb4-65" tabindex="-1"></a>(<span class="ex">define-public</span><span class="fu"> r-shapefiles</span></span>
+<span id="cb4-66"><a href="#cb4-66" tabindex="-1"></a>  (package</span>
+<span id="cb4-67"><a href="#cb4-67" tabindex="-1"></a>    (name <span class="st">"r-shapefiles"</span>)</span>
+<span id="cb4-68"><a href="#cb4-68" tabindex="-1"></a>    (version <span class="st">"0.7.2"</span>)</span>
+<span id="cb4-69"><a href="#cb4-69" tabindex="-1"></a>    (source</span>
+<span id="cb4-70"><a href="#cb4-70" tabindex="-1"></a>     (origin</span>
+<span id="cb4-71"><a href="#cb4-71" tabindex="-1"></a>       (method url-fetch)</span>
+<span id="cb4-72"><a href="#cb4-72" tabindex="-1"></a>       (uri (cran-uri <span class="st">"shapefiles"</span> version))</span>
+<span id="cb4-73"><a href="#cb4-73" tabindex="-1"></a>       (sha256</span>
+<span id="cb4-74"><a href="#cb4-74" tabindex="-1"></a>        (base32 <span class="st">"03sdcxbah05x0j6cpygx3ivkzrdlz2c0frxi30cinb05q6a41yjb"</span>))))</span>
+<span id="cb4-75"><a href="#cb4-75" tabindex="-1"></a>    (properties `((upstream-name <span class="op">.</span> <span class="st">"shapefiles"</span>)))</span>
+<span id="cb4-76"><a href="#cb4-76" tabindex="-1"></a>    (build-system r-build-system)</span>
+<span id="cb4-77"><a href="#cb4-77" tabindex="-1"></a>    (propagated-inputs (<span class="kw">list</span> (specification-&gt;package <span class="st">"r-foreign"</span>)))</span>
+<span id="cb4-78"><a href="#cb4-78" tabindex="-1"></a>    (home-page <span class="st">"https://cran.r-project.org/package=shapefiles"</span>)</span>
+<span id="cb4-79"><a href="#cb4-79" tabindex="-1"></a>    (synopsis <span class="st">"Read and Write ESRI Shapefiles"</span>)</span>
+<span id="cb4-80"><a href="#cb4-80" tabindex="-1"></a>    (description</span>
+<span id="cb4-81"><a href="#cb4-81" tabindex="-1"></a>     <span class="st">"This package provides functions to read and write ESRI shapefiles."</span>)</span>
+<span id="cb4-82"><a href="#cb4-82" tabindex="-1"></a>    (license (<span class="kw">list</span> gpl2+ gpl3+))))</span>
+<span id="cb4-83"><a href="#cb4-83" tabindex="-1"></a></span>
+<span id="cb4-84"><a href="#cb4-84" tabindex="-1"></a>(<span class="ex">define-public</span><span class="fu"> r-fossil</span></span>
+<span id="cb4-85"><a href="#cb4-85" tabindex="-1"></a>  (package</span>
+<span id="cb4-86"><a href="#cb4-86" tabindex="-1"></a>    (name <span class="st">"r-fossil"</span>)</span>
+<span id="cb4-87"><a href="#cb4-87" tabindex="-1"></a>    (version <span class="st">"0.4.0"</span>)</span>
+<span id="cb4-88"><a href="#cb4-88" tabindex="-1"></a>    (source</span>
+<span id="cb4-89"><a href="#cb4-89" tabindex="-1"></a>     (origin</span>
+<span id="cb4-90"><a href="#cb4-90" tabindex="-1"></a>       (method url-fetch)</span>
+<span id="cb4-91"><a href="#cb4-91" tabindex="-1"></a>       (uri (cran-uri <span class="st">"fossil"</span> version))</span>
+<span id="cb4-92"><a href="#cb4-92" tabindex="-1"></a>       (sha256</span>
+<span id="cb4-93"><a href="#cb4-93" tabindex="-1"></a>        (base32 <span class="st">"1hbls9m8yapnfzpv9s850ixakmnan8min1ynk7dqkbpb2px85h1p"</span>))))</span>
+<span id="cb4-94"><a href="#cb4-94" tabindex="-1"></a>    (properties `((upstream-name <span class="op">.</span> <span class="st">"fossil"</span>)))</span>
+<span id="cb4-95"><a href="#cb4-95" tabindex="-1"></a>    (build-system r-build-system)</span>
+<span id="cb4-96"><a href="#cb4-96" tabindex="-1"></a>    (propagated-inputs (<span class="kw">list</span></span>
+<span id="cb4-97"><a href="#cb4-97" tabindex="-1"></a>                        (specification-&gt;package <span class="st">"r-maps"</span> )</span>
+<span id="cb4-98"><a href="#cb4-98" tabindex="-1"></a>                        r-shapefiles</span>
+<span id="cb4-99"><a href="#cb4-99" tabindex="-1"></a>                        (specification-&gt;package <span class="st">"r-sp"</span> )))</span>
+<span id="cb4-100"><a href="#cb4-100" tabindex="-1"></a>    (home-page <span class="st">"http://matthewvavrek.com/programs-and-code/fossil/"</span>)</span>
+<span id="cb4-101"><a href="#cb4-101" tabindex="-1"></a>    (synopsis <span class="st">"Palaeoecological and Palaeogeographical Analysis Tools"</span>)</span>
+<span id="cb4-102"><a href="#cb4-102" tabindex="-1"></a>    (description</span>
+<span id="cb4-103"><a href="#cb4-103" tabindex="-1"></a>     <span class="st">"This package provides a set of analytical tools useful in analysing ecological</span></span>
+<span id="cb4-104"><a href="#cb4-104" tabindex="-1"></a><span class="st">and geographical data sets, both ancient and modern.  The package includes</span></span>
+<span id="cb4-105"><a href="#cb4-105" tabindex="-1"></a><span class="st">functions for estimating species richness (Chao 1 and 2, ACE, ICE, Jacknife),</span></span>
+<span id="cb4-106"><a href="#cb4-106" tabindex="-1"></a><span class="st">shared species/beta diversity, species area curves and geographic distances and</span></span>
+<span id="cb4-107"><a href="#cb4-107" tabindex="-1"></a><span class="st">areas."</span>)</span>
+<span id="cb4-108"><a href="#cb4-108" tabindex="-1"></a>    (license gpl2+)))</span>
+<span id="cb4-109"><a href="#cb4-109" tabindex="-1"></a></span>
+<span id="cb4-110"><a href="#cb4-110" tabindex="-1"></a><span class="co">;; guix import cran --style=specification --recursive matchFeat</span></span>
+<span id="cb4-111"><a href="#cb4-111" tabindex="-1"></a>(<span class="ex">define-public</span><span class="fu"> r-matchfeat</span></span>
+<span id="cb4-112"><a href="#cb4-112" tabindex="-1"></a>  (package</span>
+<span id="cb4-113"><a href="#cb4-113" tabindex="-1"></a>   (name <span class="st">"r-matchfeat"</span>)</span>
+<span id="cb4-114"><a href="#cb4-114" tabindex="-1"></a>   (version <span class="st">"1.0"</span>)</span>
+<span id="cb4-115"><a href="#cb4-115" tabindex="-1"></a>   (source</span>
+<span id="cb4-116"><a href="#cb4-116" tabindex="-1"></a>    (origin</span>
+<span id="cb4-117"><a href="#cb4-117" tabindex="-1"></a>     (method url-fetch)</span>
+<span id="cb4-118"><a href="#cb4-118" tabindex="-1"></a>     (uri (cran-uri <span class="st">"matchFeat"</span> version))</span>
+<span id="cb4-119"><a href="#cb4-119" tabindex="-1"></a>     (sha256</span>
+<span id="cb4-120"><a href="#cb4-120" tabindex="-1"></a>      (base32 <span class="st">"0jh484rr71b7887igfslbg7xbr661l9c34d650xd7ajx4gfpn540"</span>))))</span>
+<span id="cb4-121"><a href="#cb4-121" tabindex="-1"></a>   (properties `((upstream-name <span class="op">.</span> <span class="st">"matchFeat"</span>)))</span>
+<span id="cb4-122"><a href="#cb4-122" tabindex="-1"></a>   (build-system r-build-system)</span>
+<span id="cb4-123"><a href="#cb4-123" tabindex="-1"></a>   (propagated-inputs (<span class="kw">list</span> (specification-&gt;package <span class="st">"r-clue"</span>)</span>
+<span id="cb4-124"><a href="#cb4-124" tabindex="-1"></a>                            (specification-&gt;package <span class="st">"r-foreach"</span>)))</span>
+<span id="cb4-125"><a href="#cb4-125" tabindex="-1"></a>   (home-page <span class="st">"https://cran.r-project.org/package=matchFeat"</span>)</span>
+<span id="cb4-126"><a href="#cb4-126" tabindex="-1"></a>   (synopsis <span class="st">"One-to-One Feature Matching"</span>)</span>
+<span id="cb4-127"><a href="#cb4-127" tabindex="-1"></a>   (description</span>
+<span id="cb4-128"><a href="#cb4-128" tabindex="-1"></a>    <span class="st">"Statistical methods to match feature vectors between multiple datasets in a</span></span>
+<span id="cb4-129"><a href="#cb4-129" tabindex="-1"></a><span class="st">one-to-one fashion.  Given a fixed number of classes/distributions, for each</span></span>
+<span id="cb4-130"><a href="#cb4-130" tabindex="-1"></a><span class="st">unit, exactly one vector of each class is observed without label.  The goal is</span></span>
+<span id="cb4-131"><a href="#cb4-131" tabindex="-1"></a><span class="st">to label the feature vectors using each label exactly once so to produce the</span></span>
+<span id="cb4-132"><a href="#cb4-132" tabindex="-1"></a><span class="st">best match across datasets, e.g. by minimizing the variability within classes.</span></span>
+<span id="cb4-133"><a href="#cb4-133" tabindex="-1"></a><span class="st">Statistical solutions based on empirical loss functions and probabilistic</span></span>
+<span id="cb4-134"><a href="#cb4-134" tabindex="-1"></a><span class="st">modeling are provided.  The Gurobi software and its R interface package are</span></span>
+<span id="cb4-135"><a href="#cb4-135" tabindex="-1"></a><span class="st">required for one of the package functions (match.2x()) and can be obtained at</span></span>
+<span id="cb4-136"><a href="#cb4-136" tabindex="-1"></a><span class="st">&lt;https://www.gurobi.com/&gt; (free academic license).  For more details, refer to</span></span>
+<span id="cb4-137"><a href="#cb4-137" tabindex="-1"></a><span class="st">Degras (2022) &lt;doi:10.1080/10618600.2022.2074429&gt; </span><span class="ch">\"</span><span class="st">Scalable feature matching for</span></span>
+<span id="cb4-138"><a href="#cb4-138" tabindex="-1"></a><span class="st">large data collections</span><span class="ch">\"</span><span class="st"> and Bandelt, Maas, and Spieksma (2004)</span></span>
+<span id="cb4-139"><a href="#cb4-139" tabindex="-1"></a><span class="st">&lt;doi:10.1057/palgrave.jors.2601723&gt; </span><span class="ch">\"</span><span class="st">Local search heuristics for multi-index</span></span>
+<span id="cb4-140"><a href="#cb4-140" tabindex="-1"></a><span class="st">assignment problems with decomposable costs</span><span class="ch">\"</span><span class="st">."</span>)</span>
+<span id="cb4-141"><a href="#cb4-141" tabindex="-1"></a>   (license gpl2)))</span>
+<span id="cb4-142"><a href="#cb4-142" tabindex="-1"></a></span>
+<span id="cb4-143"><a href="#cb4-143" tabindex="-1"></a></span>
+<span id="cb4-144"><a href="#cb4-144" tabindex="-1"></a></span>
+<span id="cb4-145"><a href="#cb4-145" tabindex="-1"></a><span class="co">;; needed for stela2502/RFclust.SGE</span></span>
+<span id="cb4-146"><a href="#cb4-146" tabindex="-1"></a></span>
+<span id="cb4-147"><a href="#cb4-147" tabindex="-1"></a><span class="co">;; stas@air ~/dot/sys/my-guix-channel/my/packages$ guix import cran --style=specification --recursive --archive=git https://github.com/sonejilab/FastWilcoxTest &gt;&gt; r.scm</span></span>
+<span id="cb4-148"><a href="#cb4-148" tabindex="-1"></a></span>
+<span id="cb4-149"><a href="#cb4-149" tabindex="-1"></a>(<span class="ex">define-public</span><span class="fu"> r-fastwilcoxtest</span></span>
+<span id="cb4-150"><a href="#cb4-150" tabindex="-1"></a>  (<span class="kw">let</span> ((commit <span class="st">"c9ea65dcc41aa5f3403441899f7e558d2a7cbe7d"</span>)</span>
+<span id="cb4-151"><a href="#cb4-151" tabindex="-1"></a>        (revision <span class="st">"1"</span>))</span>
+<span id="cb4-152"><a href="#cb4-152" tabindex="-1"></a>    (package</span>
+<span id="cb4-153"><a href="#cb4-153" tabindex="-1"></a>      (name <span class="st">"r-fastwilcoxtest"</span>)</span>
+<span id="cb4-154"><a href="#cb4-154" tabindex="-1"></a>      (version (git-version <span class="st">"0.2.0"</span> revision commit))</span>
+<span id="cb4-155"><a href="#cb4-155" tabindex="-1"></a>      (source</span>
+<span id="cb4-156"><a href="#cb4-156" tabindex="-1"></a>       (origin</span>
+<span id="cb4-157"><a href="#cb4-157" tabindex="-1"></a>         (method git-fetch)</span>
+<span id="cb4-158"><a href="#cb4-158" tabindex="-1"></a>         (uri (git-reference</span>
+<span id="cb4-159"><a href="#cb4-159" tabindex="-1"></a>               (url <span class="st">"https://github.com/sonejilab/FastWilcoxTest"</span>)</span>
+<span id="cb4-160"><a href="#cb4-160" tabindex="-1"></a>               (commit commit)))</span>
+<span id="cb4-161"><a href="#cb4-161" tabindex="-1"></a>         (file-name (git-file-name name version))</span>
+<span id="cb4-162"><a href="#cb4-162" tabindex="-1"></a>         (sha256</span>
+<span id="cb4-163"><a href="#cb4-163" tabindex="-1"></a>          (base32 <span class="st">"0fpblsarxjazmbya3lr304chhc0fwsj6xp7sa5fhi4ryqqw7zrlm"</span>))))</span>
+<span id="cb4-164"><a href="#cb4-164" tabindex="-1"></a>      (properties `((upstream-name <span class="op">.</span> <span class="st">"FastWilcoxTest"</span>)))</span>
+<span id="cb4-165"><a href="#cb4-165" tabindex="-1"></a>      (build-system r-build-system)</span>
+<span id="cb4-166"><a href="#cb4-166" tabindex="-1"></a>      (inputs (<span class="kw">list</span> (specification-&gt;package <span class="st">"r-gsl"</span>)))</span>
+<span id="cb4-167"><a href="#cb4-167" tabindex="-1"></a>      (propagated-inputs (<span class="kw">list</span> (specification-&gt;package <span class="st">"r-matrix"</span>)</span>
+<span id="cb4-168"><a href="#cb4-168" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-metap"</span>)</span>
+<span id="cb4-169"><a href="#cb4-169" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-rcpp"</span>)</span>
+<span id="cb4-170"><a href="#cb4-170" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-rcppeigen"</span>)</span>
+<span id="cb4-171"><a href="#cb4-171" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-rcppprogress"</span>)</span>
+<span id="cb4-172"><a href="#cb4-172" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-reshape2"</span>)))</span>
+<span id="cb4-173"><a href="#cb4-173" tabindex="-1"></a>      (home-page <span class="st">"https://github.com/sonejilab/FastWilcoxTest"</span>)</span>
+<span id="cb4-174"><a href="#cb4-174" tabindex="-1"></a>      (synopsis</span>
+<span id="cb4-175"><a href="#cb4-175" tabindex="-1"></a>       <span class="st">"Wilcox Ranked Sum Test Implementation using Rcpp; Tests are Applied to a Sparse Matrix"</span>)</span>
+<span id="cb4-176"><a href="#cb4-176" tabindex="-1"></a>      (description</span>
+<span id="cb4-177"><a href="#cb4-177" tabindex="-1"></a>       <span class="st">"Re-implementation the the Seurat::@code{FindMarkers}'( test.use == </span><span class="ch">\"</span><span class="st">wilcox</span><span class="ch">\"</span><span class="st"> )</span></span>
+<span id="cb4-178"><a href="#cb4-178" tabindex="-1"></a><span class="st">function but implementing all calculation steps in c++.  Thereby the function is</span></span>
+<span id="cb4-179"><a href="#cb4-179" tabindex="-1"></a><span class="st">more than 10 times faster than the Seurat R implementation.  The c++ code was</span></span>
+<span id="cb4-180"><a href="#cb4-180" tabindex="-1"></a><span class="st">extracted from the @code{BioQC} @code{BioConductor} package.  It also contains</span></span>
+<span id="cb4-181"><a href="#cb4-181" tabindex="-1"></a><span class="st">other fast c++ functions to interact with sparse matrices."</span>)</span>
+<span id="cb4-182"><a href="#cb4-182" tabindex="-1"></a>      (license gpl3))))</span>
+<span id="cb4-183"><a href="#cb4-183" tabindex="-1"></a></span>
+<span id="cb4-184"><a href="#cb4-184" tabindex="-1"></a></span>
+<span id="cb4-185"><a href="#cb4-185" tabindex="-1"></a></span>
+<span id="cb4-186"><a href="#cb4-186" tabindex="-1"></a><span class="co">;; stas@air ~/dot/sys/my-guix-channel/my/packages$</span></span>
+<span id="cb4-187"><a href="#cb4-187" tabindex="-1"></a><span class="co">;; guix import cran --style=specification --recursive --archive=git https://github.com/stela2502/RFclust.SGE &gt;&gt; r.scm</span></span>
+<span id="cb4-188"><a href="#cb4-188" tabindex="-1"></a></span>
+<span id="cb4-189"><a href="#cb4-189" tabindex="-1"></a><span class="co">;; guix import: warning: failed to retrieve package information from https://cran.r-project.org/web/packages/FastWilcoxTest/DESCRIPTION: 404 (Not Found)</span></span>
+<span id="cb4-190"><a href="#cb4-190" tabindex="-1"></a></span>
+<span id="cb4-191"><a href="#cb4-191" tabindex="-1"></a></span>
+<span id="cb4-192"><a href="#cb4-192" tabindex="-1"></a>(<span class="ex">define-public</span><span class="fu"> r-rfclust-sge</span></span>
+<span id="cb4-193"><a href="#cb4-193" tabindex="-1"></a>  (<span class="kw">let</span> ((commit <span class="st">"ba586d8f0372f7ceb29b75fd3290931856ef64a8"</span>)</span>
+<span id="cb4-194"><a href="#cb4-194" tabindex="-1"></a>        (revision <span class="st">"1"</span>))</span>
+<span id="cb4-195"><a href="#cb4-195" tabindex="-1"></a>    (package</span>
+<span id="cb4-196"><a href="#cb4-196" tabindex="-1"></a>      (name <span class="st">"r-rfclust-sge"</span>)</span>
+<span id="cb4-197"><a href="#cb4-197" tabindex="-1"></a>      (version (git-version <span class="st">"0.0.0.9000"</span> revision commit))</span>
+<span id="cb4-198"><a href="#cb4-198" tabindex="-1"></a>      (source</span>
+<span id="cb4-199"><a href="#cb4-199" tabindex="-1"></a>       (origin</span>
+<span id="cb4-200"><a href="#cb4-200" tabindex="-1"></a>         (method git-fetch)</span>
+<span id="cb4-201"><a href="#cb4-201" tabindex="-1"></a>         (uri (git-reference</span>
+<span id="cb4-202"><a href="#cb4-202" tabindex="-1"></a>               (url <span class="st">"https://github.com/stela2502/RFclust.SGE"</span>)</span>
+<span id="cb4-203"><a href="#cb4-203" tabindex="-1"></a>               (commit commit)))</span>
+<span id="cb4-204"><a href="#cb4-204" tabindex="-1"></a>         (file-name (git-file-name name version))</span>
+<span id="cb4-205"><a href="#cb4-205" tabindex="-1"></a>         (sha256</span>
+<span id="cb4-206"><a href="#cb4-206" tabindex="-1"></a>          (base32 <span class="st">"0hq2rdyxylm5fhbvjpq2dncpvz2m8zfdn787hxpmj10gvv5xr435"</span>))))</span>
+<span id="cb4-207"><a href="#cb4-207" tabindex="-1"></a>      (properties `((upstream-name <span class="op">.</span> <span class="st">"RFclust.SGE"</span>)))</span>
+<span id="cb4-208"><a href="#cb4-208" tabindex="-1"></a>      (build-system r-build-system)</span>
+<span id="cb4-209"><a href="#cb4-209" tabindex="-1"></a>      (propagated-inputs (<span class="kw">list</span> (specification-&gt;package <span class="st">"r-cluster"</span>)</span>
+<span id="cb4-210"><a href="#cb4-210" tabindex="-1"></a>                               <span class="co">;; FastWilcoxTest</span></span>
+<span id="cb4-211"><a href="#cb4-211" tabindex="-1"></a>                               r-fastwilcoxtest</span>
+<span id="cb4-212"><a href="#cb4-212" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-hmisc"</span>)</span>
+<span id="cb4-213"><a href="#cb4-213" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-mass"</span>)</span>
+<span id="cb4-214"><a href="#cb4-214" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-matrix"</span>)</span>
+<span id="cb4-215"><a href="#cb4-215" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-ranger"</span>)</span>
+<span id="cb4-216"><a href="#cb4-216" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-survival"</span>)))</span>
+<span id="cb4-217"><a href="#cb4-217" tabindex="-1"></a>      (home-page <span class="st">"https://github.com/stela2502/RFclust.SGE"</span>)</span>
+<span id="cb4-218"><a href="#cb4-218" tabindex="-1"></a>      (synopsis <span class="st">"Unsupervised clustering using random forest run on SGE"</span>)</span>
+<span id="cb4-219"><a href="#cb4-219" tabindex="-1"></a>      (description</span>
+<span id="cb4-220"><a href="#cb4-220" tabindex="-1"></a>       <span class="st">"This package uses the RF clustering method described at https://</span></span>
+<span id="cb4-221"><a href="#cb4-221" tabindex="-1"></a><span class="st">labs.genetics.ucla.edu/horvath/RFclustering/RFclustering.htm.  The function is</span></span>
+<span id="cb4-222"><a href="#cb4-222" tabindex="-1"></a><span class="st">broken down into separate parts, that can be run on a SGE to reduce analysis</span></span>
+<span id="cb4-223"><a href="#cb4-223" tabindex="-1"></a><span class="st">time."</span>)</span>
+<span id="cb4-224"><a href="#cb4-224" tabindex="-1"></a>      (license expat))))</span>
+<span id="cb4-225"><a href="#cb4-225" tabindex="-1"></a></span>
+<span id="cb4-226"><a href="#cb4-226" tabindex="-1"></a></span>
+<span id="cb4-227"><a href="#cb4-227" tabindex="-1"></a></span>
+<span id="cb4-228"><a href="#cb4-228" tabindex="-1"></a></span>
+<span id="cb4-229"><a href="#cb4-229" tabindex="-1"></a><span class="co">;; guix import cran --style=specification --recursive --archive=git https://github.com/ramhiser/clusteval &gt;&gt; r.scm</span></span>
+<span id="cb4-230"><a href="#cb4-230" tabindex="-1"></a></span>
+<span id="cb4-231"><a href="#cb4-231" tabindex="-1"></a>(<span class="ex">define-public</span><span class="fu"> r-clusteval</span></span>
+<span id="cb4-232"><a href="#cb4-232" tabindex="-1"></a>  (<span class="kw">let</span> ((commit <span class="st">"09eae82610a13122d6bfd46480fc4a76eb3c752a"</span>)</span>
+<span id="cb4-233"><a href="#cb4-233" tabindex="-1"></a>        (revision <span class="st">"1"</span>))</span>
+<span id="cb4-234"><a href="#cb4-234" tabindex="-1"></a>    (package</span>
+<span id="cb4-235"><a href="#cb4-235" tabindex="-1"></a>      (name <span class="st">"r-clusteval"</span>)</span>
+<span id="cb4-236"><a href="#cb4-236" tabindex="-1"></a>      (version (git-version <span class="st">"0.2.1"</span> revision commit))</span>
+<span id="cb4-237"><a href="#cb4-237" tabindex="-1"></a>      (source</span>
+<span id="cb4-238"><a href="#cb4-238" tabindex="-1"></a>       (origin</span>
+<span id="cb4-239"><a href="#cb4-239" tabindex="-1"></a>         (method git-fetch)</span>
+<span id="cb4-240"><a href="#cb4-240" tabindex="-1"></a>         (uri (git-reference</span>
+<span id="cb4-241"><a href="#cb4-241" tabindex="-1"></a>               (url <span class="st">"https://github.com/ramhiser/clusteval"</span>)</span>
+<span id="cb4-242"><a href="#cb4-242" tabindex="-1"></a>               (commit commit)))</span>
+<span id="cb4-243"><a href="#cb4-243" tabindex="-1"></a>         (file-name (git-file-name name version))</span>
+<span id="cb4-244"><a href="#cb4-244" tabindex="-1"></a>         (sha256</span>
+<span id="cb4-245"><a href="#cb4-245" tabindex="-1"></a>          (base32 <span class="st">"1591acinzd4mgp8sg9mn0syn1caaxdy3ys99pnpqa5yb0x423y7p"</span>))))</span>
+<span id="cb4-246"><a href="#cb4-246" tabindex="-1"></a>      (properties `((upstream-name <span class="op">.</span> <span class="st">"clusteval"</span>)))</span>
+<span id="cb4-247"><a href="#cb4-247" tabindex="-1"></a>      (build-system r-build-system)</span>
+<span id="cb4-248"><a href="#cb4-248" tabindex="-1"></a>      (propagated-inputs (<span class="kw">list</span> (specification-&gt;package <span class="st">"r-ggplot2"</span>)</span>
+<span id="cb4-249"><a href="#cb4-249" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-mvtnorm"</span>)</span>
+<span id="cb4-250"><a href="#cb4-250" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-rcpp"</span>)))</span>
+<span id="cb4-251"><a href="#cb4-251" tabindex="-1"></a>      (home-page <span class="st">"https://github.com/ramhiser/clusteval"</span>)</span>
+<span id="cb4-252"><a href="#cb4-252" tabindex="-1"></a>      (synopsis <span class="st">"Evaluation of Clustering Algorithms"</span>)</span>
+<span id="cb4-253"><a href="#cb4-253" tabindex="-1"></a>      (description</span>
+<span id="cb4-254"><a href="#cb4-254" tabindex="-1"></a>       <span class="st">"This package provides a suite of tools to evaluate clustering algorithms,</span></span>
+<span id="cb4-255"><a href="#cb4-255" tabindex="-1"></a><span class="st">clusterings, and individual clusters."</span>)</span>
+<span id="cb4-256"><a href="#cb4-256" tabindex="-1"></a>      (license expat))))</span>
+<span id="cb4-257"><a href="#cb4-257" tabindex="-1"></a></span>
+<span id="cb4-258"><a href="#cb4-258" tabindex="-1"></a></span>
+<span id="cb4-259"><a href="#cb4-259" tabindex="-1"></a><span class="co">;; guix import cran --style=specification --recursive --archive=git https://github.com/lbelzile/hecmulti &gt;&gt; r.scm</span></span>
+<span id="cb4-260"><a href="#cb4-260" tabindex="-1"></a>(<span class="ex">define-public</span><span class="fu"> r-hecmulti</span></span>
+<span id="cb4-261"><a href="#cb4-261" tabindex="-1"></a>  (<span class="kw">let</span> ((commit <span class="st">"7488f654ae860a1a139bc05b8c263cf7b7fb4517"</span>)</span>
+<span id="cb4-262"><a href="#cb4-262" tabindex="-1"></a>        (revision <span class="st">"1"</span>))</span>
+<span id="cb4-263"><a href="#cb4-263" tabindex="-1"></a>    (package</span>
+<span id="cb4-264"><a href="#cb4-264" tabindex="-1"></a>      (name <span class="st">"r-hecmulti"</span>)</span>
+<span id="cb4-265"><a href="#cb4-265" tabindex="-1"></a>      (version (git-version <span class="st">"2023.11.19"</span> revision commit))</span>
+<span id="cb4-266"><a href="#cb4-266" tabindex="-1"></a>      (source</span>
+<span id="cb4-267"><a href="#cb4-267" tabindex="-1"></a>       (origin</span>
+<span id="cb4-268"><a href="#cb4-268" tabindex="-1"></a>         (method git-fetch)</span>
+<span id="cb4-269"><a href="#cb4-269" tabindex="-1"></a>         (uri (git-reference</span>
+<span id="cb4-270"><a href="#cb4-270" tabindex="-1"></a>               (url <span class="st">"https://github.com/lbelzile/hecmulti"</span>)</span>
+<span id="cb4-271"><a href="#cb4-271" tabindex="-1"></a>               (commit commit)))</span>
+<span id="cb4-272"><a href="#cb4-272" tabindex="-1"></a>         (file-name (git-file-name name version))</span>
+<span id="cb4-273"><a href="#cb4-273" tabindex="-1"></a>         (sha256</span>
+<span id="cb4-274"><a href="#cb4-274" tabindex="-1"></a>          (base32 <span class="st">"1v3yzfjkhhbd253p158d4rglarbv5fx9skr6ya4drx69bdbdr03v"</span>))))</span>
+<span id="cb4-275"><a href="#cb4-275" tabindex="-1"></a>      (properties `((upstream-name <span class="op">.</span> <span class="st">"hecmulti"</span>)))</span>
+<span id="cb4-276"><a href="#cb4-276" tabindex="-1"></a>      (build-system r-build-system)</span>
+<span id="cb4-277"><a href="#cb4-277" tabindex="-1"></a>      (arguments</span>
+<span id="cb4-278"><a href="#cb4-278" tabindex="-1"></a>       (<span class="kw">list</span></span>
+<span id="cb4-279"><a href="#cb4-279" tabindex="-1"></a>        #:modules '((guix build r-build-system)</span>
+<span id="cb4-280"><a href="#cb4-280" tabindex="-1"></a>                    (guix build minify-build-system)</span>
+<span id="cb4-281"><a href="#cb4-281" tabindex="-1"></a>                    (guix build utils)</span>
+<span id="cb4-282"><a href="#cb4-282" tabindex="-1"></a>                    (ice-9 match))</span>
+<span id="cb4-283"><a href="#cb4-283" tabindex="-1"></a>        #:imported-modules `(,@%r-build-system-modules (guix build</span>
+<span id="cb4-284"><a href="#cb4-284" tabindex="-1"></a>                                                             minify-build-system))</span>
+<span id="cb4-285"><a href="#cb4-285" tabindex="-1"></a>        #:phases '(modify-phases %standard-phases</span>
+<span id="cb4-286"><a href="#cb4-286" tabindex="-1"></a>                    (add-after 'unpack 'process-javascript</span>
+<span id="cb4-287"><a href="#cb4-287" tabindex="-1"></a>                      (lambda* (#:key inputs #:allow-other-keys)</span>
+<span id="cb4-288"><a href="#cb4-288" tabindex="-1"></a>                        (with-directory-excursion <span class="st">"inst/"</span></span>
+<span id="cb4-289"><a href="#cb4-289" tabindex="-1"></a>                          (<span class="kw">for-each</span> (match-lambda</span>
+<span id="cb4-290"><a href="#cb4-290" tabindex="-1"></a>                                      ((source <span class="op">.</span> target) (minify source</span>
+<span id="cb4-291"><a href="#cb4-291" tabindex="-1"></a>                                                                 #:target</span>
+<span id="cb4-292"><a href="#cb4-292" tabindex="-1"></a>                                                                 target)))</span>
+<span id="cb4-293"><a href="#cb4-293" tabindex="-1"></a>                                    '())))))))</span>
+<span id="cb4-294"><a href="#cb4-294" tabindex="-1"></a>      (propagated-inputs (<span class="kw">list</span> (specification-&gt;package <span class="st">"r-ggplot2"</span>)</span>
+<span id="cb4-295"><a href="#cb4-295" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-mass"</span>)</span>
+<span id="cb4-296"><a href="#cb4-296" tabindex="-1"></a>                               (specification-&gt;package <span class="st">"r-patchwork"</span>)))</span>
+<span id="cb4-297"><a href="#cb4-297" tabindex="-1"></a>      (native-inputs (<span class="kw">list</span> (specification-&gt;package <span class="st">"esbuild"</span>)</span>
+<span id="cb4-298"><a href="#cb4-298" tabindex="-1"></a>                           (specification-&gt;package <span class="st">"r-knitr"</span>)))</span>
+<span id="cb4-299"><a href="#cb4-299" tabindex="-1"></a>      (home-page <span class="st">"https://github.com/lbelzile/hecmulti"</span>)</span>
+<span id="cb4-300"><a href="#cb4-300" tabindex="-1"></a>      (synopsis <span class="st">"Matériel de cours pour Analyse multidimensionnelle appliquée"</span>)</span>
+<span id="cb4-301"><a href="#cb4-301" tabindex="-1"></a>      (description</span>
+<span id="cb4-302"><a href="#cb4-302" tabindex="-1"></a>       <span class="st">"Jeux de données et fonctions pour le cours Analyse multidimensionnelle appliquée</span></span>
+<span id="cb4-303"><a href="#cb4-303" tabindex="-1"></a><span class="st">(MATH 60602) à HEC Montréal."</span>)</span>
+<span id="cb4-304"><a href="#cb4-304" tabindex="-1"></a>      (license cc-by-sa4.0))))</span></code></pre></div>
+</div>
 </div>
 
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <div class="license">
+    <div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="&lt;&lt;ob-r-pkg-utils-get-github-repo()&gt;&gt;/issues">Report a bug</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
@@ -207,7 +616,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
 </div>
 
       </footer>
