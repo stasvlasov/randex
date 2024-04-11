@@ -1,9 +1,11 @@
 #+title: Fast and memory efficient Rand Index calculation
 #+author: Stas Vlasov
 #+email: s.vlasov@uvt.nl
-#+r_package_version: 0.0.0.9000
-#+r_package_url: <<ob-r-pkg-utils-get-github-repo()>>
-#+r_package_bug_reports: <<ob-r-pkg-utils-get-github-repo()>>/issues
+#+r-pkg-version: 0.0.0.9000
+#+r-pkg-url: <<ob-r-pkg-utils-get-github-repo()>>, https://stasvlasov.github.io/randex/
+#+r-pkg-bug-reports: <<ob-r-pkg-utils-get-github-repo()>>/issues
+
+# - Reference from [[associate-id:org:1l72scr0w1k0][randex - fast and memory efficien Rand Index]] on [2024-01-19 Fri 16:32]
 
 * README
 :PROPERTIES:
@@ -20,64 +22,83 @@
 #+end_export
 #+end
 
-** Description
+** About
 #+name: package-description
 #+begin_src org :exports results :results replace :eval yes
-  Calculates the [[https://en.wikipedia.org/wiki/Rand_index][Rand Index]]. Specifically tuned for large datasets with many small clusters.
+  Calculates the [[https://en.wikipedia.org/wiki/Rand_index][Rand Index]]. The algorithm for Rand Index estimation specifically meant for large datasets with many small clusters in which case it is the fastest and most memory efficient in comparison to procedures from other available packages (see benchmarking below).
 #+end_src
 
-** Benchmarking
+R packages that provide some function/method for calculating Rand index.
 
-#+BEGIN_SRC R :exports code
-  a <-
-      lapply(1:10^4, \(i) {
-          set.seed(111 + i)
-          sample(letters, 3)
-      }) |>
-      sapply(paste, collapse = "") |>
-      as.factor() |>
-      as.numeric()
+#+name: packages-that-provide-rand-index
+| package     | repo | call                                                                          |    version | comment                           |
+|-------------+------+-------------------------------------------------------------------------------+------------+-----------------------------------|
+| [[https://stasvlasov.github.io/randex/][randex]]      | [[https://github.com/stasvlasov/randex][git]]  | randex::rand_index(a, b)                                                      | 0.0.0.9000 | It is this package                |
+| [[https://github.com/ramhiser/clusteval][clusteval]]   | [[https://github.com/ramhiser/clusteval][git]]  | clusteval::rand(a, b)                                                         |      0.2.1 |                                   |
+| [[https://github.com/ddegras/matchFeat][matchFeat]]   | [[https://CRAN.R-project.org/package=matchFeat][cran]] | matchFeat::Rand.index(a, b)                                                   |        1.0 |                                   |
+| [[https://matthewvavrek.com/programs-and-code/fossil/][fossil]]      | [[https://cran.r-project.org/package=fossil][cran]] | fossil::rand.index(a, b)                                                      |      0.4.0 |                                   |
+| [[https://cran.r-project.org/package=ClustOfVar][ClustOfVar]]  | [[https://cran.r-project.org/package=ClustOfVar][cran]] | ClustOfVar::rand(a, b, adj =  FALSE)                                          |        1.1 |                                   |
+| [[https://lbelzile.github.io/hecmulti/][hecmulti]]    | [[https://github.com/lbelzile/hecmulti][git]]  | hecmulti::rand(a, b)                                                          | 2023.11.19 | Docs are in French:) Beautiful.   |
+| [[https://github.com/stela2502/RFclust.SGE][RFclust.SGE]] |      | getMethod(f = RFclust.SGE:::Rand, signature = 'RFclust.SGE')(data.frame(a,b)) | 0.0.0.9000 | Could not get it to work. Broken? |
+#+TBLFM: $4='(org-sbe ob-r-pkg-utils-get-package-vesion (pkg $1))
 
+#+name: packages-that-provide-rand-index-call
+#+BEGIN_SRC R :var packages=packages-that-provide-rand-index :results replace raw :wrap src R :exports none
+  ## return the vector object with names packages to benchmart as string removing packages with empty 'repo'
+  capture.output(dput(packages$call[packages$repo != ""]))
+#+END_SRC
 
-  b <-
-      lapply(1:10^4, \(i) {
-          set.seed(222 + i)
-          sample(letters, 3)
-      }) |>
-      sapply(paste, collapse = "") |>
-      as.factor() |>
-      as.numeric()
+#+RESULTS: packages-that-provide-rand-index-call
+#+begin_src R :exports none
+c("randex::rand_index(a, b)", "clusteval::rand(a, b)", "matchFeat::Rand.index(a, b)", 
+"fossil::rand.index(a, b)", "ClustOfVar::rand(a, b, adj =  FALSE)", 
+"hecmulti::rand(a, b)")
+#+end_src
 
-  c('randex::rand_index'
-  , 'matchFeat::Rand.index'
-  , 'fossil::rand.index'
-    ## , 'ClustOfVar::rand'
-    ## , 'stela2502/RFclust.SGE::Rand'
-    ## , 'ramhiser/clusteval::rand'
-    ## , 'lbelzile/hecmulti::rand'
-    ) |> lapply(
-             \(func) {
-                 ## ns <- sub("::.*$", "", func)
-                 ## func <- sub("^.*::", "", func)
-                 Rprof(memory.profiling = TRUE)
-                 ## val <- do.call(getFromNamespace(func, ns), list(a, b))
-                 val <- eval(str2expression(paste0(func, "(a, b)")))
-                 Rprof(NULL)
-                 prof <- summaryRprof(memory = "both")
-                 prof_mem <- prof$by.self[paste0('"', func, '"'), "mem.total"][[1]]
-                 prof_time <- prof$by.total[paste0('"', func, '"'), "total.time"]
-                 list(func = func
-                    , val = val
-                    , mem = paste(prof_mem, 'Mb')
-                    , time = paste(prof_time, 's'))
-             }) |>
-      do.call(rbind, args = _)
+*** Rand index estimation
 
+Rand index measures similarity between two particitionings $X$ and $Y$ (a.k.a., clusterings) of a set of $n$ elements $S$. It can also be seen as a probability of a random pair of elements from $S$ to be either in a same subset/cluster in both partitions or to be in different subsets/clusters in both partitions. It calculates as following:
 
-  ##      func                    val       mem         time    
-  ## [1,] "rand_index"            0.9998728 "3 Mb"     "0.36 s"
-  ## [2,] "matchFeat::Rand.index" 0.9998728 "840 Mb"    "0.96 s"
-  ## [3,] "fossil::rand.index"    0.9998728 "7393.2 Mb" "4.62 s"
+#+begin_src latex :results replace :wrap src math :exports results
+  Rand Index = \frac {TP + TN} {TP + FP + FN + TN} = 2 \times \frac {TP + TN} {n \times (n-1)}
+#+end_src
+
+#+RESULTS:
+#+begin_src math
+Rand Index = \frac {TP + TN} {TP + FP + FN + TN} = 2 \times \frac {TP + TN} {n \times (n-1)}
+#+end_src
+
+, where:
+- $TP$ is the number of *true positives*, i.e., a number of pairs of elements in $S$ that are in the *same* subset for both partitionins $X$ and $Y$
+- $TN$ is the number of *true negatives*, i.e., a number of pairs of elements in $S$ that are in *different* subsets for both partitionins $X$ and 
+- $FP$ is the number of false positives, i.e., a number of pairs of elements in $S$ that are in *same* subset in $X$ (assuming that $X$ represents ground thuth parititioning) and are in *different* subsets in $Y$
+- $FN$ is the number of false negatives, i.e., a number of pairs of elements in $S$ that are in *different* subsets in $X$ and are in *same* subset in $Y$
+
+The calculation of Rand Index implemented in =randex= package is slightly different from the straighforward calculation that follows the the above defitions. Since it is easear to compute disagreements between paritioning (i.e., $FP$ and $FN$) rather than agreements ($TP$ + $TN$) we can calculate it as $Rand Index = 1 - 2 \times \frac {FP + FN} {n \times (n-1)}$.
+
+*** References
+
+ClustOfVar- 
+[[https://www.jstatsoft.org/article/view/v050i13][ClustOfVar: An R Package for the Clustering of Variables | Journal of Statistical Software]]
+
+matchFeat -
+Degras (2021). Scalable Feature Matching Across Large Data Collections. https://arxiv.org/abs/2101.02035
+[[https://www.tandfonline.com/doi/full/10.1080/10618600.2022.2074429][Scalable Feature Matching Across Large Data Collections: Journal of Computational and Graphical Statistics: Vol 32 , No 1 - Get Access]]
+[[https://www.tandfonline.com/doi/full/10.1057/palgrave.jors.2601723][Local search heuristics for multi-index assignment problems with decomposable costs: Journal of the Operational Research Society: Vol 55 , No 7 - Get Access]]
+
+fossil- 
+#+BEGIN_SRC biblatex
+  @Article{,
+    title = {fossil: palaeoecological and palaeogeographical analysis
+      tools},
+    author = {Matthew J. Vavrek},
+    year = {2011},
+    journal = {Palaeontologia Electronica},
+    volume = {14},
+    pages = {1T},
+    number = {1},
+    note = {R package version 0.4.0},
+  }
 #+END_SRC
 
 ** Installation
@@ -99,54 +120,772 @@
 | name       | version | comment                                                   |
 |------------+---------+-----------------------------------------------------------|
 | [[https://rdatatable.gitlab.io/data.table/][data.table]] |         | fast data.frames, used as main input and output data type |
+#+TBLFM: $2='(org-sbe ob-r-pkg-utils-get-package-vesion (pkg $$1))
 
+#+caption: Suggested packages (=Suggests= field in the =DESCRIPTION= file)
+#+name: ob-r-pkg-table-suggests
+| name      | version | comment                                           |
+|-----------+---------+---------------------------------------------------|
+| [[https://github.com/markvanderloo/tinytest/blob/master/pkg/README.md][tinytest]]  |         | package development (unit testing)                |
+| ggplot2   |         | for visualizing benchmarks                        |
+| patchwork |         | for combining plots of memory and time benchmarks |
+#+TBLFM: $2='(org-sbe ob-r-pkg-utils-get-package-vesion (pkg $$1))
+
+** Benchmark
+The source code for benchmarking is below. All packages used in this benchmark can be fully reproduced with Guix package manager. The module with the packages definitions is below.
+
+
+*** some results (to sto)
+[2024-02-14 Wed]
+## N <- 22:25
+lentgh 3
+
+Evaluating: matchFeat::Rand.index(a, b)
+     call                          sample  result    memory     elapsed (sec)
+[1,] "randex::rand_index(a, b)"    4194304 NA        1682838448 11.607       
+[2,] "matchFeat::Rand.index(a, b)" 4194304 0.9998718 4334704504 8.563        
+$call
+[1] "randex::rand_index(a, b)"
+
+$sample
+[1] 4194304
+
+$result
+[1] NA
+
+$memory
+[1] 1682838448
+
+$`elapsed (sec)`
+[1] 11.607
+
+$memory
+[1] 1682838448
+
+$`elapsed (sec)`
+[1] 11.607
+
+Evaluating: randex::rand_index(a, b)
+    rand_index -- factoring
+    rand_index -- tabulating
+    rand_index -- combn A
+    rand_index -- combn B
+$call
+[1] "matchFeat::Rand.index(a, b)"
+
+$sample
+[1] 4194304
+
+$result
+[1] 0.9998718
+
+$memory
+[1] 4334704504
+
+$`elapsed (sec)`
+[1] 8.563
+
+$memory
+[1] 4334704504
+
+$`elapsed (sec)`
+[1] 8.563
+
+Evaluating: matchFeat::Rand.index(a, b)
+     call                          sample  result    memory     elapsed (sec)
+[1,] "randex::rand_index(a, b)"    8388608 0.9998718 3323375432 20.606       
+[2,] "matchFeat::Rand.index(a, b)" 8388608 0.9998718 4770211400 13.775       
+$call
+[1] "randex::rand_index(a, b)"
+
+$sample
+[1] 8388608
+
+$result
+[1] 0.9998718
+
+$memory
+[1] 3323375432
+
+$`elapsed (sec)`
+[1] 20.606
+
+$memory
+[1] 3323375432
+
+$`elapsed (sec)`
+[1] 20.606
+
+Evaluating: randex::rand_index(a, b)
+    rand_index -- factoring
+    rand_index -- tabulating
+    rand_index -- combn A
+    rand_index -- combn B
+$call
+[1] "matchFeat::Rand.index(a, b)"
+
+$sample
+[1] 8388608
+
+$result
+[1] 0.9998718
+
+$memory
+[1] 4770211400
+
+$`elapsed (sec)`
+[1] 13.775
+
+$memory
+[1] 4770211400
+
+$`elapsed (sec)`
+[1] 13.775
+
+Evaluating: matchFeat::Rand.index(a, b)
+     call                          sample   result    memory     elapsed (sec)
+[1,] "randex::rand_index(a, b)"    16777216 0.9998718 6587671840 40.321       
+[2,] "matchFeat::Rand.index(a, b)" 16777216 0.9998718 5642626632 26.082       
+
+$call
+[1] "randex::rand_index(a, b)"
+
+$sample
+[1] 16777216
+
+$result
+[1] 0.9998718
+
+$memory
+[1] 6587671840
+
+$`elapsed (sec)`
+[1] 40.321
+
+$memory
+[1] 6587671840
+
+$`elapsed (sec)`
+[1] 40.321
+
+Evaluating: randex::rand_index(a, b)
+    rand_index -- factoring
+    rand_index -- tabulating
+    rand_index -- combn A
+    rand_index -- combn B
+$call
+[1] "matchFeat::Rand.index(a, b)"
+
+$sample
+[1] 16777216
+
+$result
+[1] 0.9998718
+
+$memory
+[1] 5642626632
+
+$`elapsed (sec)`
+[1] 26.082
+
+$memory
+[1] 5642626632
+
+$`elapsed (sec)`
+[1] 26.082
+
+Evaluating: matchFeat::Rand.index(a, b)
+     call                          sample   result    memory      elapsed (sec)
+[1,] "randex::rand_index(a, b)"    33554432 0.9998718 12899659016 82.221       
+[2,] "matchFeat::Rand.index(a, b)" 33554432 0.9998718 7387456600  47.888
+
+*** Guix module with R packages for Benchmark
+#+BEGIN_SRC scheme
+
+  (define-module (my packages r)
+    #:use-module (gnu packages)
+    #:use-module (gnu packages statistics)
+    #:use-module (guix packages)
+    #:use-module (guix download)
+    #:use-module (guix build utils)
+    #:use-module (guix build-system r)
+    #:use-module (guix build-system trivial)
+    #:use-module (guix licenses)
+    ;; #:use-module (git)
+    ;; #:use-module (guix git)
+    #:use-module (guix git-download)
+    )
+
+
+  ;; guix import cran --recursive ClustOfVar
+
+  (define-public r-pcamixdata
+    (package
+      (name "r-pcamixdata")
+      (version "3.1")
+      (source
+       (origin
+         (method url-fetch)
+         (uri (cran-uri "PCAmixdata" version))
+         (sha256
+          (base32 "0flrsnbchwk06dmkg3vqykp9n4pqs265szn1r10navp8ki3rrmvh"))))
+      (properties `((upstream-name . "PCAmixdata")))
+      (build-system r-build-system)
+      (native-inputs (list (specification->package "r-knitr")))
+      (home-page "https://cran.r-project.org/package=PCAmixdata")
+      (synopsis "Multivariate Analysis of Mixed Data")
+      (description
+       "This package implements principal component analysis, orthogonal rotation and
+  multiple factor analysis for a mixture of quantitative and qualitative
+  variables.")
+      (license gpl2+)))
+
+  (define-public r-clustofvar
+    (package
+      (name "r-clustofvar")
+      (version "1.1")
+      (source
+       (origin
+         (method url-fetch)
+         (uri (cran-uri "ClustOfVar" version))
+         (sha256
+          (base32 "0grhkab7s58ji4cf7cxh7ahd2dxrj8aqfdf3119b40zxkxbwxcr0"))))
+      (properties `((upstream-name . "ClustOfVar")))
+      (build-system r-build-system)
+      (propagated-inputs (list r-pcamixdata))
+      (home-page "https://cran.r-project.org/package=ClustOfVar")
+      (synopsis "Clustering of Variables")
+      (description
+       "Cluster analysis of a set of variables.  Variables can be quantitative,
+  qualitative or a mixture of both.")
+      (license gpl2+)))
+
+
+
+
+  ;; guix import cran --recursive fossil
+
+  (define-public r-shapefiles
+    (package
+      (name "r-shapefiles")
+      (version "0.7.2")
+      (source
+       (origin
+         (method url-fetch)
+         (uri (cran-uri "shapefiles" version))
+         (sha256
+          (base32 "03sdcxbah05x0j6cpygx3ivkzrdlz2c0frxi30cinb05q6a41yjb"))))
+      (properties `((upstream-name . "shapefiles")))
+      (build-system r-build-system)
+      (propagated-inputs (list (specification->package "r-foreign")))
+      (home-page "https://cran.r-project.org/package=shapefiles")
+      (synopsis "Read and Write ESRI Shapefiles")
+      (description
+       "This package provides functions to read and write ESRI shapefiles.")
+      (license (list gpl2+ gpl3+))))
+
+  (define-public r-fossil
+    (package
+      (name "r-fossil")
+      (version "0.4.0")
+      (source
+       (origin
+         (method url-fetch)
+         (uri (cran-uri "fossil" version))
+         (sha256
+          (base32 "1hbls9m8yapnfzpv9s850ixakmnan8min1ynk7dqkbpb2px85h1p"))))
+      (properties `((upstream-name . "fossil")))
+      (build-system r-build-system)
+      (propagated-inputs (list
+                          (specification->package "r-maps" )
+                          r-shapefiles
+                          (specification->package "r-sp" )))
+      (home-page "http://matthewvavrek.com/programs-and-code/fossil/")
+      (synopsis "Palaeoecological and Palaeogeographical Analysis Tools")
+      (description
+       "This package provides a set of analytical tools useful in analysing ecological
+  and geographical data sets, both ancient and modern.  The package includes
+  functions for estimating species richness (Chao 1 and 2, ACE, ICE, Jacknife),
+  shared species/beta diversity, species area curves and geographic distances and
+  areas.")
+      (license gpl2+)))
+
+  ;; guix import cran --style=specification --recursive matchFeat
+  (define-public r-matchfeat
+    (package
+     (name "r-matchfeat")
+     (version "1.0")
+     (source
+      (origin
+       (method url-fetch)
+       (uri (cran-uri "matchFeat" version))
+       (sha256
+        (base32 "0jh484rr71b7887igfslbg7xbr661l9c34d650xd7ajx4gfpn540"))))
+     (properties `((upstream-name . "matchFeat")))
+     (build-system r-build-system)
+     (propagated-inputs (list (specification->package "r-clue")
+                              (specification->package "r-foreach")))
+     (home-page "https://cran.r-project.org/package=matchFeat")
+     (synopsis "One-to-One Feature Matching")
+     (description
+      "Statistical methods to match feature vectors between multiple datasets in a
+  one-to-one fashion.  Given a fixed number of classes/distributions, for each
+  unit, exactly one vector of each class is observed without label.  The goal is
+  to label the feature vectors using each label exactly once so to produce the
+  best match across datasets, e.g. by minimizing the variability within classes.
+  Statistical solutions based on empirical loss functions and probabilistic
+  modeling are provided.  The Gurobi software and its R interface package are
+  required for one of the package functions (match.2x()) and can be obtained at
+  <https://www.gurobi.com/> (free academic license).  For more details, refer to
+  Degras (2022) <doi:10.1080/10618600.2022.2074429> \"Scalable feature matching for
+  large data collections\" and Bandelt, Maas, and Spieksma (2004)
+  <doi:10.1057/palgrave.jors.2601723> \"Local search heuristics for multi-index
+  assignment problems with decomposable costs\".")
+     (license gpl2)))
+
+
+
+  ;; needed for stela2502/RFclust.SGE
+
+  ;; stas@air ~/dot/sys/my-guix-channel/my/packages$ guix import cran --style=specification --recursive --archive=git https://github.com/sonejilab/FastWilcoxTest >> r.scm
+
+  (define-public r-fastwilcoxtest
+    (let ((commit "c9ea65dcc41aa5f3403441899f7e558d2a7cbe7d")
+          (revision "1"))
+      (package
+        (name "r-fastwilcoxtest")
+        (version (git-version "0.2.0" revision commit))
+        (source
+         (origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/sonejilab/FastWilcoxTest")
+                 (commit commit)))
+           (file-name (git-file-name name version))
+           (sha256
+            (base32 "0fpblsarxjazmbya3lr304chhc0fwsj6xp7sa5fhi4ryqqw7zrlm"))))
+        (properties `((upstream-name . "FastWilcoxTest")))
+        (build-system r-build-system)
+        (inputs (list (specification->package "r-gsl")))
+        (propagated-inputs (list (specification->package "r-matrix")
+                                 (specification->package "r-metap")
+                                 (specification->package "r-rcpp")
+                                 (specification->package "r-rcppeigen")
+                                 (specification->package "r-rcppprogress")
+                                 (specification->package "r-reshape2")))
+        (home-page "https://github.com/sonejilab/FastWilcoxTest")
+        (synopsis
+         "Wilcox Ranked Sum Test Implementation using Rcpp; Tests are Applied to a Sparse Matrix")
+        (description
+         "Re-implementation the the Seurat::@code{FindMarkers}'( test.use == \"wilcox\" )
+  function but implementing all calculation steps in c++.  Thereby the function is
+  more than 10 times faster than the Seurat R implementation.  The c++ code was
+  extracted from the @code{BioQC} @code{BioConductor} package.  It also contains
+  other fast c++ functions to interact with sparse matrices.")
+        (license gpl3))))
+
+
+
+  ;; stas@air ~/dot/sys/my-guix-channel/my/packages$
+  ;; guix import cran --style=specification --recursive --archive=git https://github.com/stela2502/RFclust.SGE >> r.scm
+
+  ;; guix import: warning: failed to retrieve package information from https://cran.r-project.org/web/packages/FastWilcoxTest/DESCRIPTION: 404 (Not Found)
+
+
+  (define-public r-rfclust-sge
+    (let ((commit "ba586d8f0372f7ceb29b75fd3290931856ef64a8")
+          (revision "1"))
+      (package
+        (name "r-rfclust-sge")
+        (version (git-version "0.0.0.9000" revision commit))
+        (source
+         (origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/stela2502/RFclust.SGE")
+                 (commit commit)))
+           (file-name (git-file-name name version))
+           (sha256
+            (base32 "0hq2rdyxylm5fhbvjpq2dncpvz2m8zfdn787hxpmj10gvv5xr435"))))
+        (properties `((upstream-name . "RFclust.SGE")))
+        (build-system r-build-system)
+        (propagated-inputs (list (specification->package "r-cluster")
+                                 ;; FastWilcoxTest
+                                 r-fastwilcoxtest
+                                 (specification->package "r-hmisc")
+                                 (specification->package "r-mass")
+                                 (specification->package "r-matrix")
+                                 (specification->package "r-ranger")
+                                 (specification->package "r-survival")))
+        (home-page "https://github.com/stela2502/RFclust.SGE")
+        (synopsis "Unsupervised clustering using random forest run on SGE")
+        (description
+         "This package uses the RF clustering method described at https://
+  labs.genetics.ucla.edu/horvath/RFclustering/RFclustering.htm.  The function is
+  broken down into separate parts, that can be run on a SGE to reduce analysis
+  time.")
+        (license expat))))
+
+
+
+
+  ;; guix import cran --style=specification --recursive --archive=git https://github.com/ramhiser/clusteval >> r.scm
+
+  (define-public r-clusteval
+    (let ((commit "09eae82610a13122d6bfd46480fc4a76eb3c752a")
+          (revision "1"))
+      (package
+        (name "r-clusteval")
+        (version (git-version "0.2.1" revision commit))
+        (source
+         (origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/ramhiser/clusteval")
+                 (commit commit)))
+           (file-name (git-file-name name version))
+           (sha256
+            (base32 "1591acinzd4mgp8sg9mn0syn1caaxdy3ys99pnpqa5yb0x423y7p"))))
+        (properties `((upstream-name . "clusteval")))
+        (build-system r-build-system)
+        (propagated-inputs (list (specification->package "r-ggplot2")
+                                 (specification->package "r-mvtnorm")
+                                 (specification->package "r-rcpp")))
+        (home-page "https://github.com/ramhiser/clusteval")
+        (synopsis "Evaluation of Clustering Algorithms")
+        (description
+         "This package provides a suite of tools to evaluate clustering algorithms,
+  clusterings, and individual clusters.")
+        (license expat))))
+
+
+  ;; guix import cran --style=specification --recursive --archive=git https://github.com/lbelzile/hecmulti >> r.scm
+  (define-public r-hecmulti
+    (let ((commit "7488f654ae860a1a139bc05b8c263cf7b7fb4517")
+          (revision "1"))
+      (package
+        (name "r-hecmulti")
+        (version (git-version "2023.11.19" revision commit))
+        (source
+         (origin
+           (method git-fetch)
+           (uri (git-reference
+                 (url "https://github.com/lbelzile/hecmulti")
+                 (commit commit)))
+           (file-name (git-file-name name version))
+           (sha256
+            (base32 "1v3yzfjkhhbd253p158d4rglarbv5fx9skr6ya4drx69bdbdr03v"))))
+        (properties `((upstream-name . "hecmulti")))
+        (build-system r-build-system)
+        (arguments
+         (list
+          #:modules '((guix build r-build-system)
+                      (guix build minify-build-system)
+                      (guix build utils)
+                      (ice-9 match))
+          #:imported-modules `(,@%r-build-system-modules (guix build
+                                                               minify-build-system))
+          #:phases '(modify-phases %standard-phases
+                      (add-after 'unpack 'process-javascript
+                        (lambda* (#:key inputs #:allow-other-keys)
+                          (with-directory-excursion "inst/"
+                            (for-each (match-lambda
+                                        ((source . target) (minify source
+                                                                   #:target
+                                                                   target)))
+                                      '())))))))
+        (propagated-inputs (list (specification->package "r-ggplot2")
+                                 (specification->package "r-mass")
+                                 (specification->package "r-patchwork")))
+        (native-inputs (list (specification->package "esbuild")
+                             (specification->package "r-knitr")))
+        (home-page "https://github.com/lbelzile/hecmulti")
+        (synopsis "Matériel de cours pour Analyse multidimensionnelle appliquée")
+        (description
+         "Jeux de données et fonctions pour le cours Analyse multidimensionnelle appliquée
+  (MATH 60602) à HEC Montréal.")
+        (license cc-by-sa4.0))))
+
+#+END_SRC
 
 
 * rand_index
+:PROPERTIES:
+:ID:       org:d6bid3b1y2k0
+:END:
 
 #+BEGIN_SRC R :tangle R/rand_index.r :mkdirp yes
-  ##' Computes Rand index. 
+  ##' Computes Rand index
+  ##'
+  ##' Should be relatively fast and memory efficient. See `rand_index_benchmark`
+  ##' 
   ##' @param a particion 1 as vector
   ##' @param b partition 2 as vector
+  ##' @param verbose Whether to print logs messages
   ##' @return Rand index that ranges from 0 to 1 
-  ##' 
+  ##' @import data.table
   ##' @export 
-  rand_index <- function(a, b) {
-      stopifnot(length(a) == length(b))
-      n_pairs <- choose(length(a), 2)
-      message("    rand_index -- factoring")
-      a <- factor(a, exclude = NULL) |> as.numeric()
-      b <- factor(b, exclude = NULL) |> as.numeric()
-      message("    rand_index -- tabbing")
-      dt <- data.table::data.table(a = a, b = b)[
-                          , n_a := .N, by = a
-                        ][
-                          , n_b := .N, by = b
-                        ][
-                          , n_a_b := .N, by = .(a, b)
-                        ]
+  rand_index <- function(a, b, verbose = FALSE) {
+      ## Some basic checks
+      stopifnot(
+          "rand_index: a and b should be the same length" =
+              length(a) == length(b)
+        , "rand_index: a should be a vector of either strings or numbers" =
+              class(a) %in% c("numeric", "integer", "character"))
+      if(verbose) message("    rand_index -- factoring A and B (on common levels)")
+      factor_levels <- unique(c(a,b))
+      a <- factor(a, exclude = NULL, labels = factor_levels) |> as.numeric()
+      b <- factor(b, exclude = NULL, labels = factor_levels) |> as.numeric()
+      if(verbose) message("    rand_index -- tabulating A and B clusters")
+      dt <-
+          data.table(a = a, b = b)[
+            , n_a := .N, by = a
+          ][
+            , n_b := .N, by = b
+          ][
+            , n_a_b := .N, by = .(a, b)
+          ]
       ## sum pairs between 'agreement' intersect clusters and 'disagreement'
-      message("    rand_index -- combn A")
+      if(verbose) message("    rand_index -- combn A")
       a_comb <-
-          unique(
-              dt[n_a > 1 ,.(a, b, n_a, n_a_b)]
-          )[
+          unique(dt[n_a > 1, .(a, b, n_a, n_a_b)])[
             , .(comb = (n_a - n_a_b) * n_a_b), by = a
-          ] |>
-          _$comb |>
+          ] |> _$comb |>
+          as.numeric() |>
           sum(na.rm = TRUE)
-      message("    rand_index -- combn B")
+      if(verbose) message("    rand_index -- combn B")
       b_comb <-
-          unique(
-              dt[n_b > 1 ,.(a, b, n_b, n_a_b)]
-          )[
+          unique(dt[n_b > 1, .(a, b, n_b, n_a_b)])[
             , .(comb = (n_b - n_a_b) * n_a_b), by = b
-          ] |>
-          _$comb |>
+          ] |> _$comb |>
+          as.numeric() |>
           sum(na.rm = TRUE)
+      if(verbose) message("    rand_index -- calcutating Rand")
       ## in formula 'c + d as the number of disagreements'
-      n_disagreements <- (a_comb + b_comb) / 2  # was conting pairs twice
+      n_disagreements <- (a_comb + b_comb) / 2  # correction for conting pairs twice
+      n_pairs <- choose(length(a), 2)
       return(1 - (n_disagreements / n_pairs))
   }
-
 #+END_SRC
+
+* rand_index_benchmark
+
+Note the noweb reference in the code to the table with packages that provide Rand index.
+
+#+name: benchmarks
+#+BEGIN_SRC R :tangle R/rand_index.r :mkdirp yes :noweb yes
+  ##' Benchmark time and memory performance of various calculations of Rand index
+  ##' 
+  ##' @param return_plot Type of plot to return
+  ##' @param calls Benchmark calls that calculate Rand index for set 'a' and 'b', e.g., 'randex::rand_index(a, b)'
+  ##' @param N Integer vector of sizes for clustered sets. Sizes should be in increasing order.
+  ##' @param string_space Character space for cluster names (all ascii letters by default)
+  ##' @param string_length Length of clusted names. Kind of a proxy for number of possible clusters.
+  ##' @param mem_max Stop benchmarking if last result took more than specified number of bites of RAM (30Gb default)
+  ##' @param time_max Stop benchmarking if last result took longer than specified number of seconds (5 minutes default)
+  ##' @param return_data Do not visualize results. Just return benchmarks data for saving.
+  ##' @param rds_file Use this as data for visualizing previously calculated benchmarks obtained from `randex_benchmark(..., return_data = TRUE)`
+  ##' @param profmem_type Type of memory profiling. "allocation" type uses `utils::Rprofmem()` (for which R should be compiled with '--enable-memory-profiling' option). "snapshot" memory profiling type uses `utils::Rprof(prof, memory.profiling = TRUE)`. See more details here - https://cran.r-project.org/web/packages/profmem/vignettes/profmem.html
+  ##' @param highlight_call Call from `call` to be highlighted
+  ##' 
+  ##' @return Plot or data
+  ##' 
+  ##' @export 
+  rand_index_benchmark <- function(return_plot = c("combined", "memory", "time")[1]
+                                 , calls =
+                                       <<packages-that-provide-rand-index-call()>>
+                                 , N = 2^(10:25)
+                                 , string_space = letters
+                                 , string_length = 4
+                                 , mem_max = 30 * (2^10)^3
+                                 , time_max = 5 * 60
+                                 , return_data = FALSE
+                                 , rds_file = NULL
+                                 , profmem_type = c("allocation", "snapshot")[1]
+                                 , highlight_call = "randex::rand_index(a, b)"
+                               ) {
+      ## check args and optional dependencies
+      if(!return_data) {
+          if(!requireNamespace("ggplot2", quietly = TRUE)) {
+              stop("  randex_benchmark -- 'ggplot2' package should be installed.")
+          } else if(return_plot == "combined" && !requireNamespace("patchwork", quietly = TRUE)) {
+              stop("  randex_benchmark -- 'patchwork' package should be installed for combined plots.")
+          }
+      }
+      ## load or calculate benchmarks
+      if(is.character(rds_file)) {
+          benchmarks  <- readRDS(rds_file)
+      } else {
+          ## check profmem
+          if(profmem_type == "allocation" &&
+             !capabilities("profmem")) {
+              stop("  randex_benchmark -- to use `utils::Rprofmem()` for memory profile R should be compiled with '--enable-memory-profiling' option. Otherwise use `profmem_type = 'snapshot'`")
+          }
+          ## check packages
+          for(cal in calls) {
+              cal_pack <- sub("::.*$", "", cal)
+              if(!requireNamespace(cal_pack, quietly = TRUE)) {
+                  stop("  randex_benchmark -- ", cal_pack, " package should be installed for benchmarking.")
+              }
+          }
+          benchmarks  <- list()
+          for (n in N) {
+              ## define two random sets (a and b) of strings
+              a <-
+                  lapply(1:n, \(i) {
+                      set.seed(i)
+                      sample(string_space, string_length)
+                  }) |>
+                  sapply(paste, collapse = "")
+              b <-
+                  lapply(1:n, \(i) {
+                      set.seed(n + i)
+                      sample(string_space, string_length)
+                  }) |>
+                  sapply(paste, collapse = "")
+              ## factorize sets
+              lev_ab <- levels(factor(c(a, b)))
+              a <- factor(a, levels = lev_ab) |>
+                  as.numeric()
+              b <- factor(b, levels = lev_ab) |>
+                  as.numeric()
+              ## calc rand indexes conditional on last results
+              j <- match(n, N)
+              benchmarks[[j]] <- 
+                  ## benchmark calls
+                  calls |>
+                  lapply(\(cal) {
+                      should_calc <- if (j > 1) {
+                                         res <- benchmarks[[j-1]]
+                                         res <- res[match(cal, res[, "call"]), ]
+                                         res_mem <- res["bites"]
+                                         res_time <- res["secs"]
+                                         !is.na(res_mem) &&
+                                             ## do not calc rand if last results took more than 30Gb of ram (default)
+                                             (res_mem < mem_max) &&
+                                             (!is.na(res_time)) &&
+                                             ## do not calc if takes longer than 5 minutes (default)
+                                             (res_time < time_max)
+                                     } else {
+                                         TRUE
+                                     }
+                      if(should_calc) {
+                          message("Evaluating: ", cal)
+                          ## init profiling
+                          prof <- tempfile()
+                          if(profmem_type == "allocation") {
+                              utils::Rprofmem(prof)
+                          } else if(profmem_type == "snapshot") {
+                              utils::Rprof(prof, memory.profiling = TRUE)
+                          }
+                          ## calculate Rand index
+                          ## -----
+                          time <- system.time(
+                              val <- try(eval(str2expression(cal)))
+                          )
+                          ## -----
+                          ## kill profiling
+                          if(profmem_type == "allocation") {
+                              utils::Rprofmem(NULL)
+                              mem <-
+                                  readLines(prof) |>
+                                  strsplit(split = " :", fixed = TRUE) |>
+                                  sapply(base::`[`, 1) |>
+                                  sapply(as.numeric) |>
+                                  sum(na.rm = TRUE)
+                              mem_hu <- mem |>
+                                  utils:::format.object_size("auto")
+                          } else if(profmem_type == "snapshot") {
+                              utils::Rprof(NULL)
+                              mem <-
+                                  utils::summaryRprof(prof, memory = "stats") |>
+                                  _$by.self |>
+                                  base::`[`(paste0('"', cal, '"'), "mem.total") |>
+                                  base::`[[`(1)
+                          }
+                          ## delete tmp file
+                          unlink(prof)
+                          time <- time[["elapsed"]]
+                          names(time) <- NULL
+                          if(!inherits(val, "try-error")) {
+                              data.frame("call" = cal
+                                       , "N" = n
+                                       , "val" = val
+                                       , "bites" = mem
+                                       , "secs" = time)
+                          } else {
+                              message("Call failed: ", cal)
+                              data.frame("call" = cal
+                                       , "N" = n
+                                       , "val" = NA
+                                       , "bites" = NA
+                                       , "secs" = NA)
+                          }
+                      } else {
+                          message("Skipping: ", cal)
+                          data.frame("call" = cal
+                                   , "N" = n
+                                   , "val" = NA
+                                   , "bites" = NA
+                                   , "secs" = NA)
+                      }
+                  }) |>
+                  do.call(rbind, args = _)
+              message(benchmarks[[j]])
+          }
+      }
+      ## visualize or just return results
+            if(return_data) {
+                return(benchmarks)
+            } else {
+                benchmarks <- do.call(rbind, benchmarks)
+                ## highlight the line
+                benchmarks$line <- ifelse(benchmarks$call == highlight_call, 0.1, 0.05)
+                ## use 'x' if the value of Rand index is not correct (i.e., Rand > 1)
+                benchmarks$shape_correct_value <- as.integer(ifelse(is.na(benchmarks$val) | benchmarks$val > 1, 4, 16))
+                benchmarks$call <- sub("::.*$", "", benchmarks$call)
+                ## plot memory
+                if(return_plot != "time") {
+                    plot_mem <- ggplot2::ggplot(
+                                             data = benchmarks
+                                           , ggplot2::aes(x = N
+                                                        , y = bites
+                                                        , group = call
+                                                        , color = call)) +
+                        ggplot2::geom_point(size = 3, ggplot2::aes(shape = shape_correct_value)) +
+                        ## ggplot2::scale_shape_manual(values = ifelse(is.na(benchmarks$val) | benchmarks$val > 1, 4, 1)) +
+                        ggplot2::scale_shape_identity() + 
+                        ggplot2::geom_line(ggplot2::aes(size = call)) +
+                        ggplot2::scale_size_manual(values = `names<-`(ifelse(benchmarks$call == "randex::rand_index(a, b)", 1, 0.5), benchmarks$call)) + #
+                        ggplot2::scale_x_continuous(trans = "log10"
+                                                  , labels = scales::trans_format("log10", scales::math_format(10^.x))) + 
+                        ggplot2::scale_y_continuous(trans = "log2"
+                                                  , labels = scales::label_bytes(units = "auto_binary")
+                                                  , n.breaks = 10) + 
+                        ggplot2::annotation_logticks(sides = "b", alpha = 0.5)
+                    if(return_plot == "memory") return(plot_mem)
+                }
+                ## plot time
+                if(return_plot != "memory") {
+                    plot_time <- ggplot2::ggplot(
+                                              data = benchmarks
+                                            , ggplot2::aes(x = N
+                                                         , y = secs / 60
+                                                         , group = call
+                                                         , color = call)) +
+                        ggplot2::geom_point(ggplot2::aes(size = call)) + 
+                        ggplot2::geom_line(ggplot2::aes(size = call)) +
+                        ggplot2::scale_size_manual(values = `names<-`(ifelse(benchmarks$call == "randex::rand_index(a, b)", 1, 0.5), benchmarks$call)) + 
+                        ggplot2::scale_x_continuous(trans = "log10"
+                                                  , labels = scales::trans_format("log10", scales::math_format(10^.x))) + 
+                        ggplot2::scale_y_continuous(labels = scales::label_timespan(unit = "mins")) + 
+                        ggplot2::annotation_logticks(sides = "b", alpha = 0.5)
+                    if(return_plot == "time") return(plot_time)
+                }
+                if(return_plot == "combined") {
+                    patchwork::wrap_plots(plot_mem, plot_time, guides = 'collect')
+                }
+            }
+  }
+#+END_SRC
+

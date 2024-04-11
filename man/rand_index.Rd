@@ -2,18 +2,20 @@
 % Please edit documentation in R/rand_index.r
 \name{rand_index}
 \alias{rand_index}
-\title{Computes Rand index.}
+\title{Computes Rand index}
 \usage{
-rand_index(a, b)
+rand_index(a, b, verbose = FALSE)
 }
 \arguments{
 \item{a}{particion 1 as vector}
 
 \item{b}{partition 2 as vector}
+
+\item{verbose}{Whether to print logs messages}
 }
 \value{
 Rand index that ranges from 0 to 1
 }
 \description{
-Computes Rand index.
+Should be relatively fast and memory efficient. See \code{rand_index_benchmark}
 }

@@ -1,15 +1,20 @@
 Package: randex
 Title: Fast and memory efficient Rand Index calculation
 Version: 0.0.0.9000
-Date: 2023-07-29
+Date: 2024-04-11
 Authors@R: 
     person("Stas", "Vlasov", , "s.vlasov@uvt.nl", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
+BugReports: <<ob-r-pkg-utils-get-github-repo()>>/issues
 Depends: 
     R (>= 4.2.0)
 Imports: 
     data.table
+Suggests: 
+    ggplot2,
+    patchwork,
+    tinytest
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
