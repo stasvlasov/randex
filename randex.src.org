@@ -31,16 +31,20 @@
 R packages that provide some function/method for calculating Rand index.
 
 #+name: packages-that-provide-rand-index
-| package     | repo | call                                                                          |    version | comment                           |
-|-------------+------+-------------------------------------------------------------------------------+------------+-----------------------------------|
-| [[https://stasvlasov.github.io/randex/][randex]]      | [[https://github.com/stasvlasov/randex][git]]  | randex::rand_index(a, b)                                                      | 0.0.0.9000 | It is this package                |
-| [[https://github.com/ramhiser/clusteval][clusteval]]   | [[https://github.com/ramhiser/clusteval][git]]  | clusteval::rand(a, b)                                                         |      0.2.1 |                                   |
-| [[https://github.com/ddegras/matchFeat][matchFeat]]   | [[https://CRAN.R-project.org/package=matchFeat][cran]] | matchFeat::Rand.index(a, b)                                                   |        1.0 |                                   |
-| [[https://matthewvavrek.com/programs-and-code/fossil/][fossil]]      | [[https://cran.r-project.org/package=fossil][cran]] | fossil::rand.index(a, b)                                                      |      0.4.0 |                                   |
-| [[https://cran.r-project.org/package=ClustOfVar][ClustOfVar]]  | [[https://cran.r-project.org/package=ClustOfVar][cran]] | ClustOfVar::rand(a, b, adj =  FALSE)                                          |        1.1 |                                   |
-| [[https://lbelzile.github.io/hecmulti/][hecmulti]]    | [[https://github.com/lbelzile/hecmulti][git]]  | hecmulti::rand(a, b)                                                          | 2023.11.19 | Docs are in French:) Beautiful.   |
-| [[https://github.com/stela2502/RFclust.SGE][RFclust.SGE]] |      | getMethod(f = RFclust.SGE:::Rand, signature = 'RFclust.SGE')(data.frame(a,b)) | 0.0.0.9000 | Could not get it to work. Broken? |
-#+TBLFM: $4='(org-sbe ob-r-pkg-utils-get-package-vesion (pkg $1))
+|   | package     | repo | call                                                                          |    version | comment                           |
+| / |             | <#>  | <#>                                                                           |            |                                   |
+|---+-------------+------+-------------------------------------------------------------------------------+------------+-----------------------------------|
+|   | [[https://stasvlasov.github.io/randex/][randex]]      | [[https://github.com/stasvlasov/randex][git]]  | randex::rand_index(a, b)                                                      | 0.0.0.9000 | It is this package                |
+|   | [[https://github.com/ramhiser/clusteval][clusteval]]   | [[https://github.com/ramhiser/clusteval][git]]  | clusteval::rand(a, b)                                                         |      0.2.1 |                                   |
+|   | [[https://github.com/ddegras/matchFeat][matchFeat]]   | [[https://CRAN.R-project.org/package=matchFeat][cran]] | matchFeat::Rand.index(a, b)                                                   |        1.0 |                                   |
+|   | [[https://matthewvavrek.com/programs-and-code/fossil/][fossil]]      | [[https://cran.r-project.org/package=fossil][cran]] | fossil::rand.index(a, b)                                                      |      0.4.0 |                                   |
+|   | [[https://cran.r-project.org/package=ClustOfVar][ClustOfVar]]  | [[https://cran.r-project.org/package=ClustOfVar][cran]] | ClustOfVar::rand(a, b, adj =  FALSE)                                          |        1.1 |                                   |
+|   | [[https://lbelzile.github.io/hecmulti/][hecmulti]]    | [[https://github.com/lbelzile/hecmulti][git]]  | hecmulti::rand(a, b)                                                          | 2023.11.19 | Docs are in French:) Beautiful.   |
+|   | [[https://github.com/stela2502/RFclust.SGE][RFclust.SGE]] |      | getMethod(f = RFclust.SGE:::Rand, signature = 'RFclust.SGE')(data.frame(a,b)) | 0.0.0.9000 | Could not get it to work. Broken? |
+#+TBLFM: $5='(org-sbe ob-r-pkg-utils-get-package-vesion (pkg $2))
+
+
+
 
 #+name: packages-that-provide-rand-index-call
 #+BEGIN_SRC R :var packages=packages-that-provide-rand-index :results replace raw :wrap src R :exports none
@@ -54,6 +58,10 @@ c("randex::rand_index(a, b)", "clusteval::rand(a, b)", "matchFeat::Rand.index(a,
 "fossil::rand.index(a, b)", "ClustOfVar::rand(a, b, adj =  FALSE)", 
 "hecmulti::rand(a, b)")
 #+end_src
+
+
+
+
 
 *** Rand index estimation
 

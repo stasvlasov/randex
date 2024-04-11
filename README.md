@@ -11,15 +11,15 @@ packages (see benchmarking below).
 
 R packages that provide some function/method for calculating Rand index.
 
-| package                                                       | repo                                                  | call                                                                          | version    | comment                           |
-|---------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------------------|------------|-----------------------------------|
-| [randex](https://stasvlasov.github.io/randex/)                | [git](https://github.com/stasvlasov/randex)           | randex::rand<sub>index</sub>(a, b)                                            | 0.0.0.9000 | It is this package                |
-| [clusteval](https://github.com/ramhiser/clusteval)            | [git](https://github.com/ramhiser/clusteval)          | clusteval::rand(a, b)                                                         | 0.2.1      |                                   |
-| [matchFeat](https://github.com/ddegras/matchFeat)             | [cran](https://CRAN.R-project.org/package=matchFeat)  | matchFeat::Rand.index(a, b)                                                   | 1.0        |                                   |
-| [fossil](https://matthewvavrek.com/programs-and-code/fossil/) | [cran](https://cran.r-project.org/package=fossil)     | fossil::rand.index(a, b)                                                      | 0.4.0      |                                   |
-| [ClustOfVar](https://cran.r-project.org/package=ClustOfVar)   | [cran](https://cran.r-project.org/package=ClustOfVar) | ClustOfVar::rand(a, b, adj = FALSE)                                           | 1.1        |                                   |
-| [hecmulti](https://lbelzile.github.io/hecmulti/)              | [git](https://github.com/lbelzile/hecmulti)           | hecmulti::rand(a, b)                                                          | 2023.11.19 | Docs are in French:) Beautiful.   |
-| [RFclust.SGE](https://github.com/stela2502/RFclust.SGE)       |                                                       | getMethod(f = RFclust.SGE:::Rand, signature = 'RFclust.SGE')(data.frame(a,b)) | 0.0.0.9000 | Could not get it to work. Broken? |
+| package                                                       | version    | comment                           |
+|---------------------------------------------------------------|------------|-----------------------------------|
+| [randex](https://stasvlasov.github.io/randex/)                | 0.0.0.9000 | It is this package                |
+| [clusteval](https://github.com/ramhiser/clusteval)            | 0.2.1      |                                   |
+| [matchFeat](https://github.com/ddegras/matchFeat)             | 1.0        |                                   |
+| [fossil](https://matthewvavrek.com/programs-and-code/fossil/) | 0.4.0      |                                   |
+| [ClustOfVar](https://cran.r-project.org/package=ClustOfVar)   | 1.1        |                                   |
+| [hecmulti](https://lbelzile.github.io/hecmulti/)              | 2023.11.19 | Docs are in French:) Beautiful.   |
+| [RFclust.SGE](https://github.com/stela2502/RFclust.SGE)       | 0.0.0.9000 | Could not get it to work. Broken? |
 
 ## Rand index estimation
 
