@@ -3,27 +3,28 @@
 
 # About
 
-Calculates the [Rand Index](https://en.wikipedia.org/wiki/Rand_index).
-The algorithm for Rand Index estimation specifically meant for large
-datasets with many small clusters in which case it is the fastest and
-most memory efficient in comparison to procedures from other available
-packages (see benchmarking below).
+Memory efficient and fast calculation of [Rand
+Index](https://en.wikipedia.org/wiki/Rand_index). The package offers
+algorithm for Rand Index estimation that is specifically meant for large
+datasets with many small clusters making it the fastest and most memory
+efficient in comparison to other available R packages (see benchmarking
+below).
 
-R packages that provide some function/method for calculating Rand index.
+![](./benchmarks.png)
 
-| package                                                       | version    | comment                           |
-|---------------------------------------------------------------|------------|-----------------------------------|
-| [randex](https://stasvlasov.github.io/randex/)                | 0.0.0.9000 | It is this package                |
-| [clusteval](https://github.com/ramhiser/clusteval)            | 0.2.1      |                                   |
-| [matchFeat](https://github.com/ddegras/matchFeat)             | 1.0        |                                   |
-| [fossil](https://matthewvavrek.com/programs-and-code/fossil/) | 0.4.0      |                                   |
-| [ClustOfVar](https://cran.r-project.org/package=ClustOfVar)   | 1.1        |                                   |
-| [hecmulti](https://lbelzile.github.io/hecmulti/)              | 2023.11.19 | Docs are in French:) Beautiful.   |
-| [RFclust.SGE](https://github.com/stela2502/RFclust.SGE)       | 0.0.0.9000 | Could not get it to work. Broken? |
+| package                                                       | version    | comment                                                                            |
+|---------------------------------------------------------------|------------|------------------------------------------------------------------------------------|
+| [randex](https://stasvlasov.github.io/randex/)                | 0.0.0.9000 | This package                                                                       |
+| [clusteval](https://github.com/ramhiser/clusteval)            | 0.2.1      |                                                                                    |
+| [matchFeat](https://github.com/ddegras/matchFeat)             | 1.0        |                                                                                    |
+| [fossil](https://matthewvavrek.com/programs-and-code/fossil/) | 0.4.0      |                                                                                    |
+| [ClustOfVar](https://cran.r-project.org/package=ClustOfVar)   | 1.1        |                                                                                    |
+| [hecmulti](https://lbelzile.github.io/hecmulti/)              | 2023.11.19 | Documentation in French:)                                                          |
+| [RFclust.SGE](https://github.com/stela2502/RFclust.SGE)       | 0.0.0.9000 | Does not work. Filed an [issue](https://github.com/stela2502/RFclust.SGE/issues/1) |
 
 ## Rand index estimation
 
-Rand index measures similarity between two particitionings $X$ and $Y$
+Rand index measures similarity between two partitionings $X$ and $Y$
 (a.k.a., clusterings) of a set of $n$ elements $S$. It can also be seen
 as a probability of a random pair of elements from $S$ to be either in a
 same subset/cluster in both partitions or to be in different
@@ -50,11 +51,13 @@ Rand Index = \frac {TP + TN} {TP + FP + FN + TN} = 2 \times \frac {TP + TN} {n \
   **same** subset in $Y$
 
 The calculation of Rand Index implemented in `randex` package is
-slightly different from the straighforward calculation that follows the
-the above defitions. Since it is easear to compute disagreements between
-paritioning (i.e., $FP$ and $FN$) rather than agreements ($TP$ + $TN$)
-we can calculate it as
-$Rand Index = 1 - 2 \times \frac {FP + FN} {n \times (n-1)}$.
+slightly different from the straightforward calculation that follows the
+the above definition. Since it is easier to compute disagreements
+between partitioning (i.e., $FP$ and $FN$) rather than agreements
+($TP$ + $TN$) we can calculate it as
+$Rand Index = 1 - 2 \times \frac {FP + FN} {n \times (n-1)}$. The
+package relies on `data.table` features for efficient data manipulation
+in memory.
 
 ## References
 
@@ -388,7 +391,7 @@ time.")
       (synopsis "Evaluation of Clustering Algorithms")
       (description
        "This package provides a suite of tools to evaluate clustering algorithms,
-clusterings, and individual clusters.")
+clustering, and individual clusters.")
       (license expat))))
 
 

@@ -25,26 +25,23 @@
 ** About
 #+name: package-description
 #+begin_src org :exports results :results replace :eval yes
-  Calculates the [[https://en.wikipedia.org/wiki/Rand_index][Rand Index]]. The algorithm for Rand Index estimation specifically meant for large datasets with many small clusters in which case it is the fastest and most memory efficient in comparison to procedures from other available packages (see benchmarking below).
+  Memory efficient and fast calculation of [[https://en.wikipedia.org/wiki/Rand_index][Rand Index]]. The package offers algorithm for Rand Index estimation that is specifically meant for large datasets with many small clusters making it the fastest and most memory efficient in comparison to other available R packages (see benchmarking below).
 #+end_src
 
-R packages that provide some function/method for calculating Rand index.
+[[file:./benchmarks.png]]
 
 #+name: packages-that-provide-rand-index
-|   | package     | repo | call                                                                          |    version | comment                           |
-| / |             | <#>  | <#>                                                                           |            |                                   |
-|---+-------------+------+-------------------------------------------------------------------------------+------------+-----------------------------------|
-|   | [[https://stasvlasov.github.io/randex/][randex]]      | [[https://github.com/stasvlasov/randex][git]]  | randex::rand_index(a, b)                                                      | 0.0.0.9000 | It is this package                |
-|   | [[https://github.com/ramhiser/clusteval][clusteval]]   | [[https://github.com/ramhiser/clusteval][git]]  | clusteval::rand(a, b)                                                         |      0.2.1 |                                   |
-|   | [[https://github.com/ddegras/matchFeat][matchFeat]]   | [[https://CRAN.R-project.org/package=matchFeat][cran]] | matchFeat::Rand.index(a, b)                                                   |        1.0 |                                   |
-|   | [[https://matthewvavrek.com/programs-and-code/fossil/][fossil]]      | [[https://cran.r-project.org/package=fossil][cran]] | fossil::rand.index(a, b)                                                      |      0.4.0 |                                   |
-|   | [[https://cran.r-project.org/package=ClustOfVar][ClustOfVar]]  | [[https://cran.r-project.org/package=ClustOfVar][cran]] | ClustOfVar::rand(a, b, adj =  FALSE)                                          |        1.1 |                                   |
-|   | [[https://lbelzile.github.io/hecmulti/][hecmulti]]    | [[https://github.com/lbelzile/hecmulti][git]]  | hecmulti::rand(a, b)                                                          | 2023.11.19 | Docs are in French:) Beautiful.   |
-|   | [[https://github.com/stela2502/RFclust.SGE][RFclust.SGE]] |      | getMethod(f = RFclust.SGE:::Rand, signature = 'RFclust.SGE')(data.frame(a,b)) | 0.0.0.9000 | Could not get it to work. Broken? |
+|   | package     | repo | call                                                                          |    version | comment                       |
+| / |             | <#>  | <#>                                                                           |            |                               |
+|---+-------------+------+-------------------------------------------------------------------------------+------------+-------------------------------|
+|   | [[https://stasvlasov.github.io/randex/][randex]]      | [[https://github.com/stasvlasov/randex][git]]  | randex::rand_index(a, b)                                                      | 0.0.0.9000 | This package                  |
+|   | [[https://github.com/ramhiser/clusteval][clusteval]]   | [[https://github.com/ramhiser/clusteval][git]]  | clusteval::rand(a, b)                                                         |      0.2.1 |                               |
+|   | [[https://github.com/ddegras/matchFeat][matchFeat]]   | [[https://CRAN.R-project.org/package=matchFeat][cran]] | matchFeat::Rand.index(a, b)                                                   |        1.0 |                               |
+|   | [[https://matthewvavrek.com/programs-and-code/fossil/][fossil]]      | [[https://cran.r-project.org/package=fossil][cran]] | fossil::rand.index(a, b)                                                      |      0.4.0 |                               |
+|   | [[https://cran.r-project.org/package=ClustOfVar][ClustOfVar]]  | [[https://cran.r-project.org/package=ClustOfVar][cran]] | ClustOfVar::rand(a, b, adj =  FALSE)                                          |        1.1 |                               |
+|   | [[https://lbelzile.github.io/hecmulti/][hecmulti]]    | [[https://github.com/lbelzile/hecmulti][git]]  | hecmulti::rand(a, b)                                                          | 2023.11.19 | Documentation in French:)     |
+|   | [[https://github.com/stela2502/RFclust.SGE][RFclust.SGE]] |      | getMethod(f = RFclust.SGE:::Rand, signature = 'RFclust.SGE')(data.frame(a,b)) | 0.0.0.9000 | Does not work. Filed an [[https://github.com/stela2502/RFclust.SGE/issues/1][issue]] |
 #+TBLFM: $5='(org-sbe ob-r-pkg-utils-get-package-vesion (pkg $2))
-
-
-
 
 #+name: packages-that-provide-rand-index-call
 #+BEGIN_SRC R :var packages=packages-that-provide-rand-index :results replace raw :wrap src R :exports none
@@ -59,13 +56,9 @@ c("randex::rand_index(a, b)", "clusteval::rand(a, b)", "matchFeat::Rand.index(a,
 "hecmulti::rand(a, b)")
 #+end_src
 
-
-
-
-
 *** Rand index estimation
 
-Rand index measures similarity between two particitionings $X$ and $Y$ (a.k.a., clusterings) of a set of $n$ elements $S$. It can also be seen as a probability of a random pair of elements from $S$ to be either in a same subset/cluster in both partitions or to be in different subsets/clusters in both partitions. It calculates as following:
+Rand index measures similarity between two partitionings $X$ and $Y$ (a.k.a., clusterings) of a set of $n$ elements $S$. It can also be seen as a probability of a random pair of elements from $S$ to be either in a same subset/cluster in both partitions or to be in different subsets/clusters in both partitions. It calculates as following:
 
 #+begin_src latex :results replace :wrap src math :exports results
   Rand Index = \frac {TP + TN} {TP + FP + FN + TN} = 2 \times \frac {TP + TN} {n \times (n-1)}
@@ -82,7 +75,7 @@ Rand Index = \frac {TP + TN} {TP + FP + FN + TN} = 2 \times \frac {TP + TN} {n \
 - $FP$ is the number of false positives, i.e., a number of pairs of elements in $S$ that are in *same* subset in $X$ (assuming that $X$ represents ground thuth parititioning) and are in *different* subsets in $Y$
 - $FN$ is the number of false negatives, i.e., a number of pairs of elements in $S$ that are in *different* subsets in $X$ and are in *same* subset in $Y$
 
-The calculation of Rand Index implemented in =randex= package is slightly different from the straighforward calculation that follows the the above defitions. Since it is easear to compute disagreements between paritioning (i.e., $FP$ and $FN$) rather than agreements ($TP$ + $TN$) we can calculate it as $Rand Index = 1 - 2 \times \frac {FP + FN} {n \times (n-1)}$.
+The calculation of Rand Index implemented in =randex= package is slightly different from the straightforward calculation that follows the the above definition. Since it is easier to compute disagreements between partitioning (i.e., $FP$ and $FN$) rather than agreements ($TP$ + $TN$) we can calculate it as $Rand Index = 1 - 2 \times \frac {FP + FN} {n \times (n-1)}$. The package relies on =data.table= features for efficient data manipulation in memory.
 
 *** References
 
@@ -563,7 +556,7 @@ Evaluating: matchFeat::Rand.index(a, b)
         (synopsis "Evaluation of Clustering Algorithms")
         (description
          "This package provides a suite of tools to evaluate clustering algorithms,
-  clusterings, and individual clusters.")
+  clustering, and individual clusters.")
         (license expat))))
 
 
